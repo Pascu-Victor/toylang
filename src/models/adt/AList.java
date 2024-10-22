@@ -24,4 +24,12 @@ public class AList<T> implements IList<T> {
     public String toString() {
         return list.toString();
     }
+
+    public int size() {
+        return list.size();
+    }
+
+    public T get(int index) {
+        return list.get(index);
+    }
 }

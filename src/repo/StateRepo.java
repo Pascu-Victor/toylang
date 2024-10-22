@@ -5,10 +5,12 @@ import models.PrgState;
 public class StateRepo implements IStateRepo {
     private PrgState[] states;
     private int size;
+    private int crtPrg;
 
     public StateRepo() {
-        states = new PrgState[10];
-        size = 0;
+        this.states = new PrgState[10];
+        this.size = 0;
+        this.crtPrg = 0;
     }
 
     public void add(PrgState state) {
@@ -39,8 +41,8 @@ public class StateRepo implements IStateRepo {
         return false;
     }
 
-    public PrgState get(int index) {
-        return states[index];
+    public PrgState getCrtPrg() {
+        return states[this.crtPrg];
     }
 
     public PrgState[] getAll() {

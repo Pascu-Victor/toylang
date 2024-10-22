@@ -21,6 +21,10 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
         dict.remove(key);
     }
 
+    public ADict() {
+        dict = new java.util.HashMap<TKey, TVal>();
+    }
+
     public String toString() {
         return dict.toString();
     }

@@ -6,7 +6,7 @@ public interface IStateRepo {
     void add(PrgState elem);
     void remove(PrgState elem);
     boolean contains(PrgState elem);
-    PrgState get(int index);
+    PrgState getCrtPrg();
     PrgState[] getAll();
     String toString();
 }

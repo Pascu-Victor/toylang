@@ -1,10 +1,9 @@
 package models.statements;
 
-import java.util.concurrent.ExecutionException;
-
+import exceptions.ExecutionException;
 import models.PrgState;
 
 public interface IStmt {
-    PrgState execute(PrgState state) throws ExecutionException, exceptions.ExecutionException;
+    PrgState execute(PrgState state) throws ExecutionException;
     IStmt deepCopy();
 }

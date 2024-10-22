@@ -47,7 +47,7 @@ public class PrgState {
         this.originalProgram = originalProgram;
     }
 
-    PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, IStmt program) {
+    public PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, IStmt program) {
         this.exeStack = exeStack;
         this.symTable = symTable;
         this.out = out;
