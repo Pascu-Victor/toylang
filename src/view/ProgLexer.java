@@ -32,7 +32,20 @@ public class ProgLexer {
     }
 
     private void skipComment() {
-        while (currentChar != '\0' && currentChar != '\n') {
+        skipWhitespace();
+        if(currentChar == '/') {
+            int oldPos = pos;
+            char oldChar = currentChar;
+            advance();
+            if(currentChar != '/') {
+                pos = oldPos;
+                currentChar = oldChar;
+                return;
+            }
+            consume('/');
+            while (currentChar != '\0' && currentChar != '\n') {
+                advance();
+            }
             advance();
         }
     }
@@ -59,7 +72,7 @@ public class ProgLexer {
         if (currentChar == expected) {
             advance();
         } else {
-            throw new RuntimeException("Unexpected character: " + currentChar);
+            throw new RuntimeException("Unexpected character: " + currentChar + " expected: " + expected);
         }
     }
 
@@ -83,12 +96,30 @@ public class ProgLexer {
             case DIVIDE:
                 consume('/');
                 break;
-            // case AND:
-            //     consumeKeyword("and");
-            //     break;
-            // case OR:
-            //     consumeKeyword("or");
-            //     break;
+            case AND:
+                consumeKeyword("&&");
+                break;
+            case OR:
+                consumeKeyword("||");
+                break;
+            case LESS:
+                consume('<');
+                break;
+            case LESSEQ:
+                consumeKeyword("<=");
+                break;
+            case EQUAL:
+                consumeKeyword("==");
+                break;
+            case GREATER:
+                consumeKeyword(">=");
+                break;
+            case GREATEREQ:
+                consumeKeyword(">=");
+                break;
+            case NOTEQ:
+                consumeKeyword("!=");
+                break;
             default:
                 throw new RuntimeException("Unexpected operator: " + op);
         }
@@ -106,6 +137,7 @@ public class ProgLexer {
 
     private IStmt statement() {
         skipWhitespace();
+        skipComment();
         if (currentChar == '\0') {
             return null;
         }
@@ -119,12 +151,20 @@ public class ProgLexer {
                 return varDeclInt();
             case "bool":
                 return varDeclBool();
+            case "string":
+                return varDeclString();
             case "print":
                 return printStmt();
             case "if":
                 return ifStmt();
             case "nop":
                 return nopStmt();
+            case "openRFile":
+                return openRFileStmt();
+            case "readFile":
+                return readFileStmt();
+            case "closeRFile":
+                return closeRFileStmt();
             default:
                 return assignStmt();
         }
@@ -149,11 +189,54 @@ public class ProgLexer {
         return new VarDeclStmt(id, new BoolType());
     }
 
+    private VarDeclStmt varDeclString() {
+        consumeKeyword("string");
+        skipWhitespace();
+        String id = id();
+        return new VarDeclStmt(id, new StringType());
+    }
+
     private AssignStmt assignStmt() {
         String id = id();
         consume('=');
+        if(currentChar == '"') {
+            advance();
+            StringBuilder result = new StringBuilder();
+            while (currentChar != '\0' && currentChar != '"') {
+                result.append(currentChar);
+                advance();
+            }
+            consume('"');
+            return new AssignStmt(id, new ValueExp(new StringValue(result.toString())));
+        }
         IExp exp = expression();
         return new AssignStmt(id, exp);
+    }
+
+    private OpenRFileStmt openRFileStmt() {
+        consumeKeyword("openRFile");
+        consume('(');
+        IExp fileName = expression();
+        consume(')');
+        return new OpenRFileStmt(fileName);
+    }
+
+    private CloseRFileStmt closeRFileStmt() {
+        consumeKeyword("closeRFile");
+        consume('(');
+        IExp fileName = expression();
+        consume(')');
+        return new CloseRFileStmt(fileName);
+    }
+
+    private ReadFileStmt readFileStmt() {
+        consumeKeyword("readFile");
+        consume('(');
+        IExp fileName = expression();
+        consume(',');
+        String varName = id();
+        consume(')');
+        return new ReadFileStmt(fileName, varName);
     }
 
     private PrintStmt printStmt() {
@@ -202,30 +285,111 @@ public class ProgLexer {
         OpEnum op = operator();
         IExp exp2 = expression();
         consume(')');
-        return new ArithExp(exp1, exp2, op);
+        switch (op) {
+            case OpEnum.PLUS:
+            case OpEnum.MINUS:
+            case OpEnum.STAR:
+            case OpEnum.DIVIDE:
+                return new ArithExp(exp1, exp2, op);
+            case OpEnum.AND:
+            case OpEnum.OR:
+                return new LogicExp(exp1, exp2, op);
+            case OpEnum.LESS:
+            case OpEnum.LESSEQ:
+            case OpEnum.EQUAL:
+            case OpEnum.NOTEQ:
+            case OpEnum.GREATER:
+            case OpEnum.GREATEREQ:
+                return new RelExp(exp1, exp2, op);
+            default:
+                throw new RuntimeException("Could not handle operator: " + op);
+        }
     }
 
+    private String lookaheadOperator() {
+        int oldPos = pos;
+        char oldChar = currentChar;
+        StringBuilder result = new StringBuilder();
+        if (currentChar == '<' || currentChar == '>' || currentChar == '=' || currentChar == '!') {
+            result.append(currentChar);
+            advance();
+            if (currentChar == '=') {
+            result.append(currentChar);
+            advance();
+            }
+        }
+        pos = oldPos;
+        currentChar = oldChar;
+        return result.toString();
+    }
+    
     private OpEnum operator() {
         skipWhitespace();
         switch (currentChar) {
             case '+':
-                advance();
+                consumeOperator(OpEnum.PLUS);
                 return OpEnum.PLUS;
             case '-':
-                advance();
+                consumeOperator(OpEnum.MINUS);
                 return OpEnum.MINUS;
             case '*':
-                advance();
+                consumeOperator(OpEnum.STAR);
                 return OpEnum.STAR;
             case '/':
-                advance();
+                consumeOperator(OpEnum.DIVIDE);
                 return OpEnum.DIVIDE;
-            // case 'a':
-            //     consumeKeyword("and");
-            //     return OpEnum.AND;
-            // case 'o':
-            //     consumeKeyword("or");
-            //     return OpEnum.OR;
+            case '&':
+                consumeOperator(OpEnum.AND);
+                return OpEnum.AND;
+            case '|':
+                consumeOperator(OpEnum.OR);
+                return OpEnum.OR;
+            case '<':
+            {
+                var tk = lookaheadOperator();
+                switch (tk) {
+                    case "<":
+                        consumeOperator(OpEnum.LESS);
+                        return OpEnum.LESS;
+                    case "<=":
+                        consumeOperator(OpEnum.LESSEQ);
+                        return OpEnum.LESSEQ;
+                    default:
+                        throw new RuntimeException("Unexpected operator: " + currentChar);
+                }
+            }
+            case '>':
+            {
+                var tk = lookaheadOperator();
+                switch (tk) {
+                    case ">":
+                        consumeOperator(OpEnum.GREATER);
+                        return OpEnum.GREATER;
+                    case "<=":
+                        consumeOperator(OpEnum.GREATEREQ);
+                        return OpEnum.GREATEREQ;
+                    default:
+                        throw new RuntimeException("Unexpected operator: " + currentChar);
+                }
+            }
+            case '=':
+            {
+                var tk = lookaheadOperator();
+                if(tk == "==") {
+                    consumeOperator(OpEnum.EQUAL);
+                    return OpEnum.EQUAL;
+                }
+                throw new RuntimeException("Unexpected operator: " + currentChar);
+            }
+            case '!':
+            {
+                var tk = lookaheadOperator();
+                if(tk == "!=") {
+                    consumeOperator(OpEnum.NOTEQ);
+                    return OpEnum.NOTEQ;
+                }
+                throw new RuntimeException("Unexpected operator: " + currentChar);
+            }
             default:
                 throw new RuntimeException("Unexpected operator: " + currentChar);
         }

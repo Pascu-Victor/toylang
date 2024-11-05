@@ -22,7 +22,10 @@ public class AList<T> implements IList<T> {
     }
 
     public String toString() {
-        return list.toString();
+        return list.stream()
+               .map(Object::toString)
+               .reduce((elem1, elem2) -> elem1 + "\n" + elem2)
+               .orElse("");
     }
 
     public int size() {

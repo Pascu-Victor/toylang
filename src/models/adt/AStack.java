@@ -1,6 +1,7 @@
 package models.adt;
 
 import java.util.Stack;
+import java.util.stream.Stream;
 
 public class AStack<T> implements IStack<T> {
     private Stack<T> stack;
@@ -17,12 +18,11 @@ public class AStack<T> implements IStack<T> {
         return stack.pop();
     }
 
+    public Stream<T> stream() {
+        return stack.stream();
+    }
+
     public boolean isEmpty() {
         return stack.isEmpty();
     }
-
-    public String toString() {
-        return stack.toString();
-    }
-
 }

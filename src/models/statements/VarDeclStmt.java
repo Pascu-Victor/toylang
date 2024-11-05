@@ -18,7 +18,7 @@ public class VarDeclStmt implements IStmt {
     }
 
     public String toString() {
-        return type.toString() + " " + name;
+        return "declare(" +type.toString() + " " + name + ")";
     }
 
     public VarDeclStmt deepCopy() {

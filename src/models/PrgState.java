@@ -1,5 +1,8 @@
 package models;
 
+import java.io.BufferedReader;
+import java.util.stream.Collectors;
+
 import models.adt.ADict;
 import models.adt.AList;
 import models.adt.AStack;
@@ -8,11 +11,13 @@ import models.values.IValue;
 
 public class PrgState {
     private AStack<IStmt> exeStack;
-
     
     private ADict<String, IValue> symTable;
     
     private AList<IValue> out;
+
+    private ADict<String, BufferedReader> fileTable;
+
     IStmt originalProgram;
     
     public AStack<IStmt> getExeStack() {
@@ -47,16 +52,42 @@ public class PrgState {
         this.originalProgram = originalProgram;
     }
 
-    public PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, IStmt program) {
+    public ADict<String, BufferedReader> getFileTable() {
+        return fileTable;
+    }
+
+    public void setFileTable(ADict<String, BufferedReader> fileTable) {
+        this.fileTable = fileTable;
+    }
+
+    public PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, ADict<String, BufferedReader> fbs, IStmt program) {
         this.exeStack = exeStack;
         this.symTable = symTable;
         this.out = out;
         this.originalProgram = program.deepCopy();
+        this.fileTable = fbs;
         exeStack.push(program);
     }
 
+
     @Override
     public String toString() {
-        return "ExeStack: " + exeStack.toString() + "\nSymTable: " + symTable.toString() + "\nOut: " + out.toString();
+        var s = new StringBuilder();
+        
+        var exeList = exeStack.stream().collect(Collectors.toList());
+
+        for(IStmt stmt : exeList.reversed()) {
+            s.append(stmt + "\n");
+        }
+
+        return
+        "ExeStack:\n"
+        + s.toString()
+        + "SymTable:\n"
+        + symTable.toString()
+        + "Out:\n"
+        + out.toString();
+        // + "\nFile Table: "
+        // + fileTable.toString();
     }
 }

@@ -3,15 +3,16 @@ package models.expressions;
 import exceptions.ExecutionException;
 import models.adt.IDict;
 import models.types.IntType;
+import models.values.BoolValue;
 import models.values.IValue;
 import models.values.IntValue;
 
-public class ArithExp implements IExp {
+public class RelExp implements IExp {
     IExp lhs;
     IExp rhs;
     OpEnum op;
 
-    public ArithExp(IExp lhs, IExp rhs, OpEnum op) {
+    public RelExp(IExp lhs, IExp rhs, OpEnum op) {
         this.lhs = lhs;
         this.rhs = rhs;
         this.op = op;
@@ -33,17 +34,18 @@ public class ArithExp implements IExp {
         int n2 = i2.getVal();
 
         switch (op) {
-            case PLUS:
-                return new IntValue(n1+n2);
-            case MINUS:
-                return new IntValue(n1-n2);
-            case STAR:
-                return new IntValue(n1*n2);
-            case DIVIDE:
-                if(n2 == 0) {
-                    throw new ExecutionException("Division by zero");
-                }
-                return new IntValue(n1/n2);
+            case LESS:
+                return new BoolValue(n1<n2);
+            case LESSEQ:
+                return new BoolValue(n1<=n2);
+            case EQUAL:
+                return new BoolValue(n1==n2);
+            case NOTEQ:
+                return new BoolValue(n1!=n2);
+            case GREATER:
+                return new BoolValue(n1>n2);
+            case GREATEREQ:
+                return new BoolValue(n1>=n2);
             default:
                 throw new ExecutionException("Invalid operator, got" + op.toString());
         }
@@ -57,4 +59,5 @@ public class ArithExp implements IExp {
     public String toString() {
         return lhs.toString() + " " + op.toString() + " " + rhs.toString();
     }
+
 }

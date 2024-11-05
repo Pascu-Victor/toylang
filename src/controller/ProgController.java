@@ -15,25 +15,20 @@ public class ProgController implements IProgController {
         this.repo = repo;
     }
 
+
     public PrgState oneStep(PrgState state) throws ExecutionException {
         var stk = state.getExeStack();
         if(stk.isEmpty()) throw new ExecutionException("Program stack is empty");
         var crtStmt = stk.pop();
-        if(display) {
-            callback.accept(crtStmt.toString());
-        }
         return crtStmt.execute(state);
     }
 
     public void allStep() throws ExecutionException {
         var prog = repo.getCrtPrg();
-        if(display) {
-            callback.accept(prog.toString());
-        }
-        int step = 0;
+        repo.logPrgStateExec();
         while (!prog.getExeStack().isEmpty()) {
-            var res = this.oneStep(prog);
-            callback.accept("Step ("+ step++ +"):\n"+ res.toString());
+            this.oneStep(prog);
+            repo.logPrgStateExec();
         }
     }
 

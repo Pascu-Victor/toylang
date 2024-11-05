@@ -1,5 +1,6 @@
 package repo;
 
+import exceptions.ExecutionException;
 import models.PrgState;
 
 public interface IStateRepo {
@@ -9,4 +10,5 @@ public interface IStateRepo {
     PrgState getCrtPrg();
     PrgState[] getAll();
     String toString();
+    void logPrgStateExec() throws ExecutionException;
 }

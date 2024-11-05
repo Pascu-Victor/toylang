@@ -8,9 +8,9 @@ import models.values.IValue;
 public class LogicExp implements IExp {
     IExp exp1;
     IExp exp2;
-    String op;
+    OpEnum op;
 
-    public LogicExp(IExp exp1, IExp exp2, String op) {
+    public LogicExp(IExp exp1, IExp exp2, OpEnum op) {
         this.exp1 = exp1;
         this.exp2 = exp2;
         this.op = op;
@@ -25,9 +25,9 @@ public class LogicExp implements IExp {
         }
 
         switch (op) {
-            case "&&":
+            case AND:
                 return new BoolValue(((BoolValue) v1).getVal() && ((BoolValue) v2).getVal());
-            case "||":
+            case OR:
                 return new BoolValue(((BoolValue) v1).getVal() || ((BoolValue) v2).getVal());
             default:
                 throw new ExecutionException("Invalid operator");

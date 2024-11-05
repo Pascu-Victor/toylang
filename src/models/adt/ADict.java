@@ -26,6 +26,10 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
     }
 
     public String toString() {
-        return dict.toString();
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<TKey, TVal> entry : dict.entrySet()) {
+            sb.append(entry.getKey()).append(" --> ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
     }
 }
