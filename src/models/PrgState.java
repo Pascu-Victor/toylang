@@ -86,8 +86,9 @@ public class PrgState {
         + "SymTable:\n"
         + symTable.toString()
         + "Out:\n"
-        + out.toString();
-        // + "\nFile Table: "
-        // + fileTable.toString();
+        + out.toString()
+        + "File Table:\n"
+        + fileTable.keys().toString()
+        + "\n";
     }
 }

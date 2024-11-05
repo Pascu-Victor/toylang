@@ -40,26 +40,34 @@ public class Interpreter {
         return new ProgController(repo);
     }
 
+    private static void command(TextMenu menu, String logName, String progKey, String progDesc, String src) {
+        var c = parseProgram(src, logName);
+        var command = new RunExampleCommand(progKey, progDesc, c);
+        menu.addCommand(command);
+    }
+
+
     public static void main(String[] args) throws Exception {
-        // var source = "int v; int m; v=2; m=3; v=(v+m); nop; print(v); print(m)";
-        // var source = "bool a; a=true; int v; if a then v=2 else v=3; print(v)";
-        // var source = "int a; a=(2+(3*5)); int b; b=((a-(4/2)) + 7); print(b)";
-        var source = "string varf;\n" + //
-                        "varf=\"test.in\";\n" + //
-                        "//cats are cool\n" +
-                        "openRFile(varf);//caaaaats\n" + //
-                        "int varc;\n" + //
-                        "readFile(varf,varc);print(varc);\n" + //
-                        "readFile(varf,varc);print(varc)\n" + //
+        var source1 = "int v; int m; v=2; m=3; v=(v+m); nop; print(v); print(m)";
+        var source2 = "bool a; a=true; int v; if a then v=2 else v=3; print(v)";
+        var source3 = "int a; a=(2+(3*5)); int b; b=((a-(4/2)) + 7); print(b)";
+        var source4 = "string varf;\n" +
+                        "varf=\"test.in\";\n" +
+                        "//cooooomeeeeent\n" +
+                        "openRFile(varf);//comment\n" +
+                        "int varc;\n" +
+                        "readFile(varf,varc);print(varc);\n" +
+                        "readFile(varf,varc);print(varc)\n" +
                         "closeRFile(varf)";
-        // var source = "bool a; a=(1 <= 2)";
-        var controller = parseProgram(source, "A.log");
-        var command1 = new RunExampleCommand("prg1", "program 1", controller);
-        controller.setConsumer(s -> TextMenu.displayString(s));
+        var source5 = "bool a; int b;b = 1; a = (b <= 2); if(a && (b != 5)) then print(b) else print(0)";
 
         var textMenu = new TextMenu();
 
-        textMenu.addCommand(command1);
+        command(textMenu, "prg1.log", "prg1", "program 1", source1);
+        command(textMenu, "prg2.log", "prg2", "program 2", source2);
+        command(textMenu, "prg3.log", "prg3", "program 3", source3);
+        command(textMenu, "prg4.log", "prg4", "program 4", source4);
+        command(textMenu, "prg5.log", "prg5", "program 5", source5);
         textMenu.addCommand(new ExitCommand("exit", "exit program"));
 
         textMenu.show();

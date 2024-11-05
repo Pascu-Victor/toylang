@@ -198,7 +198,9 @@ public class ProgLexer {
 
     private AssignStmt assignStmt() {
         String id = id();
+        skipWhitespace();
         consume('=');
+        skipWhitespace();
         if(currentChar == '"') {
             advance();
             StringBuilder result = new StringBuilder();
@@ -281,9 +283,13 @@ public class ProgLexer {
             return new VarExp(id());
         }
         consume('(');
+        skipWhitespace();
         IExp exp1 = expression();
+        skipWhitespace();
         OpEnum op = operator();
+        skipWhitespace();
         IExp exp2 = expression();
+        skipWhitespace();
         consume(')');
         switch (op) {
             case OpEnum.PLUS:
@@ -320,7 +326,7 @@ public class ProgLexer {
         }
         pos = oldPos;
         currentChar = oldChar;
-        return result.toString();
+        return result.toString().trim();
     }
     
     private OpEnum operator() {
@@ -375,7 +381,7 @@ public class ProgLexer {
             case '=':
             {
                 var tk = lookaheadOperator();
-                if(tk == "==") {
+                if(tk.equals("==")) {
                     consumeOperator(OpEnum.EQUAL);
                     return OpEnum.EQUAL;
                 }
@@ -384,7 +390,7 @@ public class ProgLexer {
             case '!':
             {
                 var tk = lookaheadOperator();
-                if(tk == "!=") {
+                if(tk.equals("!=")) {
                     consumeOperator(OpEnum.NOTEQ);
                     return OpEnum.NOTEQ;
                 }

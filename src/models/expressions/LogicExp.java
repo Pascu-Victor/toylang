@@ -20,7 +20,7 @@ public class LogicExp implements IExp {
         IValue v1 = exp1.eval(symTable);
         IValue v2 = exp2.eval(symTable);
 
-        if (v1.getType() != v2.getType()) {
+        if (!v1.getType().equals(v2.getType())) {
             throw new ExecutionException("Types do not match");
         }
 

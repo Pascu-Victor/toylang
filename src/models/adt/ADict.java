@@ -32,4 +32,12 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
         }
         return sb.toString();
     }
+
+    public AList<TKey> keys() {
+        var keys = new AList<TKey>();
+        for (Map.Entry<TKey,TVal> entry : dict.entrySet()) {
+            keys.add(entry.getKey());
+        }
+        return keys;
+    }
 }
