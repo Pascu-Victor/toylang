@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import models.adt.ADict;
 import models.adt.AList;
 import models.adt.AStack;
+import models.adt.Heap;
 import models.statements.IStmt;
 import models.values.IValue;
 
@@ -17,6 +18,8 @@ public class PrgState {
     private AList<IValue> out;
 
     private ADict<String, BufferedReader> fileTable;
+
+    private Heap heap;
 
     IStmt originalProgram;
     
@@ -36,6 +39,10 @@ public class PrgState {
         return originalProgram;
     }
 
+    public Heap getHeap() {
+        return heap;
+    }
+
     public void setExeStack(AStack<IStmt> exeStack) {
         this.exeStack = exeStack;
     }
@@ -46,6 +53,10 @@ public class PrgState {
 
     public void setOut(AList<IValue> out) {
         this.out = out;
+    }
+
+    public void setHeap(Heap heap) {
+        this.heap = heap;
     }
 
     public void setOriginalProgram(IStmt originalProgram) {
@@ -60,15 +71,15 @@ public class PrgState {
         this.fileTable = fileTable;
     }
 
-    public PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, ADict<String, BufferedReader> fbs, IStmt program) {
+    public PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, ADict<String, BufferedReader> fbs, Heap heap, IStmt program) {
         this.exeStack = exeStack;
         this.symTable = symTable;
         this.out = out;
         this.originalProgram = program.deepCopy();
         this.fileTable = fbs;
+        this.heap = heap;
         exeStack.push(program);
     }
-
 
     @Override
     public String toString() {
@@ -87,8 +98,9 @@ public class PrgState {
         + symTable.toString()
         + "Out:\n"
         + out.toString()
-        + "File Table:\n"
+        + "\nFile Table:\n"
         + fileTable.keys().toString()
-        + "\n";
+        + "\nHeap:\n"
+        + heap.toString();
     }
 }

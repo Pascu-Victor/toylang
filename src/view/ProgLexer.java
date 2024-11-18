@@ -1,5 +1,8 @@
 package view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import models.expressions.*;
 import models.statements.*;
 import models.types.*;
@@ -112,7 +115,7 @@ public class ProgLexer {
                 consumeKeyword("==");
                 break;
             case GREATER:
-                consumeKeyword(">=");
+                consume('>');
                 break;
             case GREATEREQ:
                 consumeKeyword(">=");
@@ -135,6 +138,45 @@ public class ProgLexer {
         return token;
     }
 
+    // A reference type is a recursive type such that,
+    // in our ToyLanguage we can allow the following types:
+    // Ref(int) x1;
+    // Ref bool x2;
+    // Ref (Ref (int)) x3;
+    // Ref Ref Ref string x4;
+    // Ref Ref Ref Ref bool x5;
+
+    private IType parseType() {
+        skipWhitespace();
+        if (lookaheadToken().equals("Ref")) {
+            consumeKeyword("Ref");
+            skipWhitespace();
+            return new RefType(parseType());
+        }
+        switch (lookaheadToken()) {
+            case "int":
+            consumeKeyword("int");
+            return new IntType();
+            case "bool":
+            consumeKeyword("bool");
+            return new BoolType();
+            case "string":
+            consumeKeyword("string");
+            return new StringType();
+            default:
+            throw new RuntimeException("Unexpected type: " + lookaheadToken());
+        }
+    }
+
+    private VarDeclStmt varDeclRef() {
+        consumeKeyword("Ref");
+        skipWhitespace();
+        IType innerType = parseType();
+        skipWhitespace();
+        String id = id();
+        return new VarDeclStmt(id, new RefType(innerType));
+    }
+
     private IStmt statement() {
         skipWhitespace();
         skipComment();
@@ -153,6 +195,8 @@ public class ProgLexer {
                 return varDeclBool();
             case "string":
                 return varDeclString();
+            case "Ref":
+                return varDeclRef();
             case "print":
                 return printStmt();
             case "if":
@@ -165,6 +209,12 @@ public class ProgLexer {
                 return readFileStmt();
             case "closeRFile":
                 return closeRFileStmt();
+            case "while":
+                return whileStmt();
+            case "new":
+                return newStmt();
+            case "wH":
+                return whStmt();
             default:
                 return assignStmt();
         }
@@ -265,6 +315,84 @@ public class ProgLexer {
         return new IfStmt(exp, thenS, elseS);
     }
 
+    private IStmt consumeCodeBlock() {
+        skipWhitespace();
+        consume('{');
+        List<IStmt> stmts = new ArrayList<>();
+        while (currentChar != '}') {
+            IStmt stmt = statement();
+            if (stmt != null) {
+            stmts.add(stmt);
+            }
+            skipWhitespace();
+        }
+        consume('}');
+        IStmt comp = stmts.get(stmts.size() - 1);
+        for (int i = stmts.size() - 2; i >= 0; i--) {
+            comp = new CompStmt(stmts.get(i), comp);
+        }
+        skipWhitespace();
+        return comp;
+    }
+
+    private WhileStmt whileStmt() {
+        consumeKeyword("while");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        IExp condExp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        IStmt stmts = consumeCodeBlock();
+        skipWhitespace();
+        return new WhileStmt(condExp, stmts);
+    }
+
+    private NewStmt newStmt() {
+        consumeKeyword("new");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        String refVar = id();
+        skipWhitespace();
+        consume(',');
+        skipWhitespace();
+        IExp addrExp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        return new NewStmt(refVar, addrExp);
+    }
+
+    private WHStmt whStmt() {
+        consumeKeyword("wH");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        String refName = id();
+        skipWhitespace();
+        consume(',');
+        skipWhitespace();
+        IExp valExp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        return new WHStmt(refName, valExp);
+    }
+
+    private RHExp rhExp() {
+        consumeKeyword("rH");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        IExp addrExp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        return new RHExp(addrExp);
+    }
+
     private IExp expression() {
         skipWhitespace();
         if (Character.isDigit(currentChar)) {
@@ -278,6 +406,9 @@ public class ProgLexer {
         if (token.equals("false")) {
             consumeKeyword("false");
             return new ValueExp(new BoolValue(false));
+        }
+        if (token.equals("rH")) {
+            return rhExp();
         }
         if (Character.isLetter(currentChar)) {
             return new VarExp(id());

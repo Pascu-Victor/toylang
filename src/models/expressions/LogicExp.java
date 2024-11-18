@@ -2,6 +2,7 @@ package models.expressions;
 
 import exceptions.ExecutionException;
 import models.adt.IDict;
+import models.adt.IHeap;
 import models.values.BoolValue;
 import models.values.IValue;
 
@@ -16,9 +17,9 @@ public class LogicExp implements IExp {
         this.op = op;
     }
 
-    public IValue eval(IDict<String, IValue> symTable) throws ExecutionException {
-        IValue v1 = exp1.eval(symTable);
-        IValue v2 = exp2.eval(symTable);
+    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
+        IValue v1 = exp1.eval(symTable, heap);
+        IValue v2 = exp2.eval(symTable, heap);
 
         if (!v1.getType().equals(v2.getType())) {
             throw new ExecutionException("Types do not match");

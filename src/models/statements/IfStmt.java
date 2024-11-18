@@ -25,7 +25,7 @@ public class IfStmt implements IStmt {
     }
 
     public PrgState execute(PrgState state) throws ExecutionException {
-        var r = exp.eval(state.getSymTable());
+        var r = exp.eval(state.getSymTable(), state.getHeap());
         if (r instanceof BoolValue) {
             if (((BoolValue)r).getVal()) {
                 state.getExeStack().push(thenS);

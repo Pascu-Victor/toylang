@@ -1,5 +1,6 @@
 package models.adt;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
@@ -19,6 +20,10 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
 
     public void remove(TKey key) {
         dict.remove(key);
+    }
+
+    public Collection<TVal> values() {
+        return dict.values();
     }
 
     public ADict() {

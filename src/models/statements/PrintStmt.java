@@ -2,7 +2,6 @@ package models.statements;
 
 import exceptions.ExecutionException;
 import models.PrgState;
-import models.adt.IDict;
 import models.adt.IList;
 import models.expressions.IExp;
 import models.values.IValue;
@@ -21,8 +20,7 @@ public class PrintStmt implements IStmt {
             throw new ExecutionException("Invalid PrintStmt");
         }
         IList<IValue> out = state.getOut();
-        IDict<String, IValue> symTbl = state.getSymTable();
-        out.add(exp.eval(symTbl));
+        out.add(exp.eval(state.getSymTable(), state.getHeap()));
         return state;
     }
 

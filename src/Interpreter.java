@@ -35,7 +35,8 @@ public class Interpreter {
         var st = new ADict<String, IValue>();
         var out = new AList<IValue>();
         var fbs = new ADict<String, BufferedReader>();
-        var prg = new PrgState(stk, st, out, fbs, comp);
+        var heap = new Heap();
+        var prg = new PrgState(stk, st, out, fbs, heap, comp);
         var repo = new StateRepo(prg,logFile);
         return new ProgController(repo);
     }
@@ -60,6 +61,11 @@ public class Interpreter {
                         "readFile(varf,varc);print(varc)\n" +
                         "closeRFile(varf)";
         var source5 = "bool a; int b;b = 1; a = (b <= 2); if(a && (b != 5)) then print(b) else print(0)";
+        var sourceNew = "Ref int v;new(v,20);Ref Ref int a; new(a,v);print(v);print(a)";
+        var sourcerH = "Ref int v;new(v,20);Ref Ref int a; new(a,v);print(rH(v));print((rH(rH(a))+5))";
+        var sourcewH = "Ref int v;new(v,20);print(rH(v)); wH(v,30);print((rH(v)+5));";
+        var sourceGC = "Ref int v;new(v,20);Ref Ref int a; new(a,v); new(v,30);print(rH(rH(a)))";
+        var sourcewhile = "int v; v=4; while ((v>0)){ print(v);v=(v-1);print(v)}";
 
         var textMenu = new TextMenu();
 
@@ -68,6 +74,12 @@ public class Interpreter {
         command(textMenu, "prg3.log", "prg3", "program 3", source3);
         command(textMenu, "prg4.log", "prg4", "program 4", source4);
         command(textMenu, "prg5.log", "prg5", "program 5", source5);
+        command(textMenu, "prgNew.log", "New", "New program", sourceNew);
+        command(textMenu, "prgrH.log", "rH", "rH program", sourcerH);
+        command(textMenu, "prgwH.log", "wH", "wH program", sourcewH);
+        command(textMenu, "prgGC.log", "GC", "GC program", sourceGC);
+        command(textMenu, "prgwhile.log", "while", "while program", sourcewhile);
+
         textMenu.addCommand(new ExitCommand("exit", "exit program"));
 
         textMenu.show();

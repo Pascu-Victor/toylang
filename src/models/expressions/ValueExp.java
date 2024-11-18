@@ -1,6 +1,7 @@
 package models.expressions;
 
 import models.adt.IDict;
+import models.adt.IHeap;
 import models.values.IValue;
 
 public class ValueExp implements IExp {
@@ -10,7 +11,7 @@ public class ValueExp implements IExp {
         this.value = value;
     }
 
-    public IValue eval(IDict<String, IValue> symTable) {
+    public IValue eval(IDict<String, IValue> symTable, IHeap heap) {
         return value;
     }
 

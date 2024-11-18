@@ -15,7 +15,7 @@ public class CloseRFileStmt implements IStmt {
 
     @Override
     public PrgState execute(PrgState state) throws ExecutionException {
-        var val = fileName.eval(state.getSymTable());
+        var val = fileName.eval(state.getSymTable(), state.getHeap());
         if (!val.getType().equals(new StringType())) {
             throw new ExecutionException("File name must be a string");
         }

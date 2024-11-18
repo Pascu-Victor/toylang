@@ -2,6 +2,7 @@ package models.expressions;
 
 import exceptions.ExecutionException;
 import models.adt.IDict;
+import models.adt.IHeap;
 import models.types.IntType;
 import models.values.IValue;
 import models.values.IntValue;
@@ -17,12 +18,12 @@ public class ArithExp implements IExp {
         this.op = op;
     }
 
-    public IValue eval(IDict<String, IValue> symTable) throws ExecutionException {
-        IValue lhsVal = lhs.eval(symTable);
+    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
+        IValue lhsVal = lhs.eval(symTable, heap);
         if(!lhsVal.getType().equals(new IntType())) {
             throw new ExecutionException("Invalid type for lhs, got: " + lhsVal.getType().toString());
         }
-        IValue rhsVal = rhs.eval(symTable);
+        IValue rhsVal = rhs.eval(symTable, heap);
         if(!rhsVal.getType().equals((new IntType()))) {
             throw new ExecutionException("Invalid type for rhs, got: " + rhsVal.getType().toString());
         }

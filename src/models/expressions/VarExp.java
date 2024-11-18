@@ -2,6 +2,7 @@ package models.expressions;
 
 import exceptions.ExecutionException;
 import models.adt.IDict;
+import models.adt.IHeap;
 import models.values.IValue;
 
 public class VarExp implements IExp {
@@ -11,7 +12,7 @@ public class VarExp implements IExp {
         this.id = id;
     }
 
-    public IValue eval(IDict<String, IValue> symTable) throws ExecutionException {
+    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
         return symTable.get(id);
     }
 

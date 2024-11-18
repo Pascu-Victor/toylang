@@ -20,7 +20,7 @@ public class OpenRFileStmt implements IStmt{
     }
 
     public PrgState execute(PrgState state) throws ExecutionException {
-        IValue val = filename.eval(state.getSymTable());
+        IValue val = filename.eval(state.getSymTable(), state.getHeap());
         if (val.getType() instanceof StringType) {
             String str = ((StringValue)val).getVal();
             if (state.getFileTable().containsKey(str)) {
