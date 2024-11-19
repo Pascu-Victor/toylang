@@ -18,6 +18,7 @@ public class TextMenu {
 
     public void addCommand(Command c){ commands.put(c.getKey(),c);}
     private void printMenu(){
+        System.err.println("\nCommands:");
         for(Command com : commands.values()){
             String line=String.format("%4s : %s", com.getKey(), com.getDescription());
             System.out.println(line);

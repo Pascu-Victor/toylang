@@ -98,9 +98,10 @@ public class PrgState {
         + symTable.toString()
         + "Out:\n"
         + out.toString()
-        + "\nFile Table:\n"
+        + "File Table:\n"
         + fileTable.keys().toString()
-        + "\nHeap:\n"
-        + heap.toString();
+        + "Heap:\n"
+        + heap.toString()
+        + "\n";
     }
 }

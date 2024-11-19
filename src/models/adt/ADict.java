@@ -2,6 +2,7 @@ package models.adt;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
     private Map<TKey, TVal> dict;
@@ -31,11 +32,9 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<TKey, TVal> entry : dict.entrySet()) {
-            sb.append(entry.getKey()).append(" --> ").append(entry.getValue()).append("\n");
-        }
-        return sb.toString();
+        return dict.entrySet().stream()
+        .map(e -> e.getKey() + "-->" + e.getValue())
+        .collect(Collectors.joining("\n"));
     }
 
     public AList<TKey> keys() {

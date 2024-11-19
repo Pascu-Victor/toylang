@@ -25,7 +25,7 @@ public class AList<T> implements IList<T> {
     public String toString() {
         return list.stream()
                .map(Object::toString)
-               .collect(Collectors.joining("\n"));
+               .collect(Collectors.joining("\n")) + "\n";
     }
 
     public int size() {

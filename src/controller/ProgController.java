@@ -1,11 +1,11 @@
 package controller;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import exceptions.ExecutionException;
 import models.PrgState;
@@ -24,42 +24,38 @@ public class ProgController implements IProgController {
         this.repo = repo;
     }
 
-    Map<Integer, IHeap.HeapEntry> unsafeGarbageCollector(List<Integer> symTableAddr, IHeap heap){
-        System.err.println(symTableAddr);
+    Map<Integer, IHeap.HeapEntry> safeGarbageCollector(List<Integer> addrsToKeep, IHeap heap){
         return heap.entrySet().stream()
-        .filter(e->symTableAddr.contains(e.getKey()))
+        .filter(e->addrsToKeep.contains(e.getKey()))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
     
-    List<Integer> getAddrFromSymTable(Collection<IValue> symTableValues){
+    List<Integer> getAddr(Collection<IValue> symTableValues, IHeap heap){
         return symTableValues.stream()
         .filter(v->v instanceof RefValue)
+        .filter(v->((RefValue)v).getAddr()!=0)
+        .filter(v->heap.contains(((RefValue)v).getAddr()))
         .map(v->{
             RefValue v1 = (RefValue)v;
-            return v1.getAddr();
+            return getRefsRec(v1.getAddr(), heap);
         })
+        .flatMap(e -> e)
         .collect(Collectors.toList());
     }
 
-    private List<Integer> getRefsToRefsHeap(Collection<IValue> symTableValues, Heap heap){
-        //keep values that are referenced in the symbol table or indirectly referenced in the heap by a reference in the symbol table
-        return symTableValues.stream()
-        .filter(v->v instanceof RefValue)
-        .map(v->{
-            RefValue v1 = (RefValue)v;
-            return v1.getAddr();
-        })
-        .filter(addr->heap.contains(addr))
-        .map(addr->{
-            IValue v1 = heap.at(addr);
-            if(v1 instanceof RefValue){
-                RefValue v2 = (RefValue)v1;
-                return v2.getAddr();
+    private Stream<Integer> getRefsRec(int addr, IHeap heap){
+        try {
+            var v = heap.at(addr);
+            if(v.getType() instanceof RefType){
+                return Stream.concat(
+                    getRefsRec(((RefValue)v).getAddr(), heap),
+                    Stream.of(addr)
+                );
             }
-            return -1;
-        })
-        .filter(addr->addr!=-1)
-        .collect(Collectors.toList());
+        } catch (ExecutionException e) {
+
+        }
+        return Stream.of(addr);
     }
         
 
@@ -77,8 +73,8 @@ public class ProgController implements IProgController {
             this.oneStep(prog);
             repo.logPrgStateExec();
             prog.getHeap().setContent(
-                unsafeGarbageCollector(
-                    getAddrFromSymTable(prog.getSymTable().values()),
+                safeGarbageCollector(
+                    getAddr(prog.getSymTable().values(),prog.getHeap()),
                     prog.getHeap()
                 )
             );

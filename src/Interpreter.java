@@ -64,7 +64,8 @@ public class Interpreter {
         var sourceNew = "Ref int v;new(v,20);Ref Ref int a; new(a,v);print(v);print(a)";
         var sourcerH = "Ref int v;new(v,20);Ref Ref int a; new(a,v);print(rH(v));print((rH(rH(a))+5))";
         var sourcewH = "Ref int v;new(v,20);print(rH(v)); wH(v,30);print((rH(v)+5));";
-        var sourceGC = "Ref int v;new(v,20);Ref Ref int a; new(a,v); new(v,30);print(rH(rH(a)))";
+        var sourceGC1 = "Ref int v; Ref int c; new(c,200);new(v,20);Ref Ref int a; new(a,v); new(v,30);print(rH(rH(a)));new(a,c)";
+        var sourceGC2 = "Ref int v; Ref Ref Ref int c;new(v,20);Ref Ref int a; new(a,v);new(c,a); new(v,30);print(rH(rH(rH(c))))";
         var sourcewhile = "int v; v=4; while ((v>0)){ print(v);v=(v-1);print(v)}";
 
         var textMenu = new TextMenu();
@@ -77,7 +78,8 @@ public class Interpreter {
         command(textMenu, "prgNew.log", "New", "New program", sourceNew);
         command(textMenu, "prgrH.log", "rH", "rH program", sourcerH);
         command(textMenu, "prgwH.log", "wH", "wH program", sourcewH);
-        command(textMenu, "prgGC.log", "GC", "GC program", sourceGC);
+        command(textMenu, "prgGC1.log", "GC1", "GC program 1", sourceGC1);
+        command(textMenu, "prgGC2.log", "GC2", "GC program 2", sourceGC2);
         command(textMenu, "prgwhile.log", "while", "while program", sourcewhile);
 
         textMenu.addCommand(new ExitCommand("exit", "exit program"));

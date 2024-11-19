@@ -2,6 +2,7 @@ package models.adt;
 
 import models.values.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +15,8 @@ import exceptions.ExecutionException;
 public class Heap implements IHeap {
     
     private Map<Integer, HeapEntry> vals;
+
+    private int addr = 1;
 
     public IValue at(int addr) throws ExecutionException{
         try {
@@ -32,7 +35,7 @@ public class Heap implements IHeap {
     }
 
     public int add(IValue val) {
-        vals.put(vals.size() + 1, new HeapEntry(val));
+        vals.put(addr++, new HeapEntry(val));
         return vals.size();
     }
 
@@ -61,11 +64,15 @@ public class Heap implements IHeap {
     }
 
     public void setContent(Map<Integer, HeapEntry> content) {
-        
+        this.vals = content;
     }
 
     public Heap() {
         vals = new HashMap<>();
+    }
+
+    public Collection<Integer> getValues() {
+        return vals.keySet();
     }
 
     @Override
