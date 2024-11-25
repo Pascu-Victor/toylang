@@ -1,5 +1,7 @@
 package repo;
 
+import java.util.List;
+
 import exceptions.ExecutionException;
 import models.PrgState;
 
@@ -7,8 +9,8 @@ public interface IStateRepo {
     void add(PrgState elem);
     void remove(PrgState elem);
     boolean contains(PrgState elem);
-    PrgState getCrtPrg();
-    PrgState[] getAll();
     String toString();
-    void logPrgStateExec() throws ExecutionException;
+    void logPrgStateExec(PrgState state) throws ExecutionException;
+    List<PrgState> getPrgList();
+    void setPrgList(List<PrgState> states);
 }

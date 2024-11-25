@@ -4,66 +4,42 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import exceptions.ExecutionException;
 import models.PrgState;
 
 public class StateRepo implements IStateRepo {
-    private PrgState[] states;
+    private List<PrgState> states;
     private int size;
     private int crtPrg;
     private String logFilePath;
 
     public StateRepo() {
-        this.states = new PrgState[10];
+        this.states = new ArrayList<>();
         this.size = 0;
         this.crtPrg = 0;
     }
 
     public StateRepo(PrgState state, String logFile) {
-        this.states = new PrgState[10];
+        this.states = new ArrayList<>();
         this.size = 1;
         this.crtPrg = 0;
-        this.states[0] = state;
+        this.states.add(state);
         this.logFilePath = logFile;
     }
 
     public void add(PrgState state) {
-        if (size == states.length) {
-            PrgState[] newStates = new PrgState[states.length * 2];
-            System.arraycopy(states, 0, newStates, 0, states.length);
-            states = newStates;
-        }
-        states[size++] = state;
+        states.add(state);
     }
 
     public void remove(PrgState state) {
-        for (int i = 0; i < size; i++) {
-            if (states[i] == state) {
-                System.arraycopy(states, i + 1, states, i, size - i - 1);
-                size--;
-                break;
-            }
-        }
+        states.remove(state);
     }
 
     public boolean contains(PrgState state) {
-        for (int i = 0; i < size; i++) {
-            if (states[i] == state) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public PrgState getCrtPrg() {
-        return states[this.crtPrg];
-    }
-
-    public PrgState[] getAll() {
-        PrgState[] allStates = new PrgState[size];
-        System.arraycopy(states, 0, allStates, 0, size);
-        return allStates;
+        return this.states.contains(state);
     }
 
     @Override
@@ -82,16 +58,23 @@ public class StateRepo implements IStateRepo {
         this.logFilePath = logFilePath;
     }
 
-    public void logPrgStateExec() throws ExecutionException {
-        PrgState crtPrg = getCrtPrg();
+    public void logPrgStateExec(PrgState state) throws ExecutionException {
         try {
             var logFile = new PrintWriter(new BufferedWriter(new FileWriter(this.logFilePath, true)));
-            logFile.println(crtPrg.toString());
+            logFile.println(state.toString());
             logFile.flush();
             logFile.close();
         }
         catch (IOException e) {
             throw new ExecutionException("Could not open log file: " + e.getMessage());
         }
+    }
+
+    public List<PrgState> getPrgList() {
+        return states;
+    }
+
+    public void setPrgList(List<PrgState> states) {
+        this.states = states;
     }
 }

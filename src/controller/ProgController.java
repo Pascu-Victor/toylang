@@ -59,13 +59,6 @@ public class ProgController implements IProgController {
     }
         
 
-    public PrgState oneStep(PrgState state) throws ExecutionException {
-        var stk = state.getExeStack();
-        if(stk.isEmpty()) throw new ExecutionException("Program stack is empty");
-        var crtStmt = stk.pop();
-        return crtStmt.execute(state);
-    }
-
     public void allStep() throws ExecutionException {
         var prog = repo.getCrtPrg();
         repo.logPrgStateExec();

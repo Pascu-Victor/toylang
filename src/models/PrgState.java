@@ -3,6 +3,7 @@ package models;
 import java.io.BufferedReader;
 import java.util.stream.Collectors;
 
+import exceptions.ExecutionException;
 import models.adt.ADict;
 import models.adt.AList;
 import models.adt.AStack;
@@ -20,6 +21,8 @@ public class PrgState {
     private ADict<String, BufferedReader> fileTable;
 
     private Heap heap;
+
+    private static int id;
 
     IStmt originalProgram;
     
@@ -71,7 +74,12 @@ public class PrgState {
         this.fileTable = fileTable;
     }
 
-    public PrgState(AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, ADict<String, BufferedReader> fbs, Heap heap, IStmt program) {
+    public static synchronized int getId() {
+        return id;
+    }
+
+    public PrgState(int id, AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, ADict<String, BufferedReader> fbs, Heap heap, IStmt program) {
+        PrgState.id = id;
         this.exeStack = exeStack;
         this.symTable = symTable;
         this.out = out;
@@ -79,6 +87,17 @@ public class PrgState {
         this.fileTable = fbs;
         this.heap = heap;
         exeStack.push(program);
+    }
+
+    public boolean isNotCompleted() {
+        return !exeStack.isEmpty();
+    }
+
+    public PrgState oneStep() throws ExecutionException {
+        var stk = this.getExeStack();
+        if(stk.isEmpty()) throw new ExecutionException("Program stack is empty");
+        var crtStmt = stk.pop();
+        return crtStmt.execute(this);
     }
 
     @Override
@@ -92,7 +111,9 @@ public class PrgState {
         }
 
         return
-        "ExeStack:\n"
+        "State:"
+        + Integer.toString(PrgState.id)
+        +"\nExeStack:\n"
         + s.toString()
         + "SymTable:\n"
         + symTable.toString()
