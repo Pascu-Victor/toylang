@@ -44,6 +44,6 @@ public class NewStmt implements IStmt {
         var type = ((RefType)ref.getType()).getInner();
         state.getSymTable().set(varName, new RefValue(addr, type));
         
-        return state;
+        return null;
     }
 }

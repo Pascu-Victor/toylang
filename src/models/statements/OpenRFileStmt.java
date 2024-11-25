@@ -41,7 +41,7 @@ public class OpenRFileStmt implements IStmt{
         } else {
             throw new ExecutionException("Filename is not a string");
         }
-        return state;
+        return null;
     }
 
     public IStmt deepCopy() {

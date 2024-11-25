@@ -14,7 +14,7 @@ public class VarDeclStmt implements IStmt {
 
     public PrgState execute(PrgState state) throws ExecutionException {
         state.getSymTable().set(name, type.defaultValue());
-        return state;
+        return null;
     }
 
     public String toString() {

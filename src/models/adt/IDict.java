@@ -6,4 +6,5 @@ public interface IDict<TKey, TVal> {
     boolean containsKey(TKey key);
     void remove(TKey key);
     String toString();
+    IDict<TKey,TVal> deepCopy();
 }

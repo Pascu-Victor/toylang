@@ -4,7 +4,7 @@ import models.PrgState;
 
 public class NopStmt implements IStmt {
     public PrgState execute(PrgState state) {
-        return state;
+        return null;
     }
 
     public String toString() {

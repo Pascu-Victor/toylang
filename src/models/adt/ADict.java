@@ -1,11 +1,16 @@
 package models.adt;
 
+import java.util.HashMap;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
     private Map<TKey, TVal> dict;
+
+    public ADict (Map<TKey, TVal> dict){
+        this.dict=new HashMap<TKey,TVal> (dict);
+    }
 
     public void set(TKey key, TVal value) {
         dict.put(key, value);
@@ -43,5 +48,8 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
             keys.add(entry.getKey());
         }
         return keys;
+    }
+    public ADict<TKey,TVal> deepCopy(){
+        return new ADict<>(this.dict);
     }
 }

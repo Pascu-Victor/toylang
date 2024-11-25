@@ -3,6 +3,8 @@ package controller;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,9 +21,11 @@ public class ProgController implements IProgController {
     IStateRepo repo;
     Consumer<String> callback;
     boolean display = false;
+    ExecutorService executor;
 
-    public ProgController(IStateRepo repo) {
+    public ProgController(IStateRepo repo, ExecutorService exe) {
         this.repo = repo;
+        executor = exe;
     }
 
     Map<Integer, IHeap.HeapEntry> safeGarbageCollector(List<Integer> addrsToKeep, IHeap heap){
@@ -59,12 +63,7 @@ public class ProgController implements IProgController {
     }
         
 
-    public PrgState oneStep(PrgState state) throws ExecutionException {
-        var stk = state.getExeStack();
-        if(stk.isEmpty()) throw new ExecutionException("Program stack is empty");
-        var crtStmt = stk.pop();
-        return crtStmt.execute(state);
-    }
+   
 
     public void allStep() throws ExecutionException {
         var prog = repo.getCrtPrg();
@@ -82,6 +81,36 @@ public class ProgController implements IProgController {
         }
     }
 
+    public void oneStepForAllPrg(List<PrgState> prgList) {
+        prgList.forEach(prg->{
+            try {
+                repo.logPrgStateExec(prg);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+
+        List<Callable<PrgState>> callList = prgList.stream().map(p->(Callable<PrgState>)(()->p.oneStep())).toList();
+
+        try {
+            List<PrgState> newPrgList = executor.invokeAll(callList).stream().map(future->{
+                try {
+                    return future.get();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (java.util.concurrent.ExecutionException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                                return null;
+            }).filter(p->p!=null).toList();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void toggleDisplayState() {
         this.display = !this.display;
     }
@@ -91,5 +120,10 @@ public class ProgController implements IProgController {
             throw new ExecutionException("Consumer already set");
         }
         this.callback = displayCallback;
+    }
+
+    @Override
+    public List<PrgState> removeCompletedPrg(List<PrgState> lst) {
+        return lst.stream().filter(l->l.isNotCompleted()).toList();
     }
 }

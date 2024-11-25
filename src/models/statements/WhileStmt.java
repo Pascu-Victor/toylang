@@ -37,7 +37,7 @@ public class WhileStmt implements IStmt {
             state.getExeStack().push(stmts);
         }
 
-        return state;
+        return null;
     }
 
 }

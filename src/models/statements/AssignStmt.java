@@ -24,6 +24,6 @@ public class AssignStmt implements IStmt {
 
     public PrgState execute(PrgState state) throws ExecutionException {
         state.getSymTable().set(this.id, this.exp.eval(state.getSymTable(), state.getHeap()));
-        return state;
+        return null;
     }
 }

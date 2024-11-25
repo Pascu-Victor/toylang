@@ -39,7 +39,7 @@ public class ReadFileStmt implements IStmt {
         catch (NumberFormatException e) {
             throw new ExecutionException("File content must be an integer");
         }
-        return state;
+        return null;
     }
 
     @Override

@@ -57,7 +57,7 @@ public class WHStmt implements IStmt {
 
         state.getHeap().set(refVal.getAddr(), valueToSet);
 
-        return state;
+        return null;
     }
 
     @Override
