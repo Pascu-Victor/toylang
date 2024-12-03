@@ -2,17 +2,23 @@ package models.statements;
 
 import exceptions.ExecutionException;
 import models.PrgState;
+import models.adt.CloneableString;
 import models.expressions.IExp;
 import models.types.RefType;
 import models.values.IValue;
 import models.values.RefValue;
 
 public class WHStmt implements IStmt {
-    private String varName;
+    private CloneableString varName;
     private IExp exp;
 
-    public WHStmt(String varName, IExp exp) {
+    public WHStmt(CloneableString varName, IExp exp) {
         this.varName = varName;
+        this.exp = exp;
+    }
+
+    public WHStmt(String varName, IExp exp) {
+        this.varName = new CloneableString(varName);
         this.exp = exp;
     }
 
@@ -57,7 +63,7 @@ public class WHStmt implements IStmt {
 
         state.getHeap().set(refVal.getAddr(), valueToSet);
 
-        return state;
+        return null;
     }
 
     @Override

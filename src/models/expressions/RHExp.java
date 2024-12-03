@@ -1,6 +1,7 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
 import models.values.IValue;
@@ -13,7 +14,7 @@ public class RHExp implements IExp {
         this.ref = ref;
     }
 
-    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
+    public IValue eval(IDict<CloneableString, IValue> symTable, IHeap heap) throws ExecutionException {
         IValue val = this.ref.eval(symTable, heap);
         if (val instanceof RefValue) {
             RefValue refVal = (RefValue) val;

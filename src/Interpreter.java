@@ -1,5 +1,3 @@
-import java.io.BufferedReader;
-
 import controller.IProgController;
 import controller.ProgController;
 import models.PrgState;
@@ -32,9 +30,9 @@ public class Interpreter {
         }
 
         var stk = new AStack<IStmt>();
-        var st = new ADict<String, IValue>();
+        var st = new ADict<CloneableString, IValue>();
         var out = new AList<IValue>();
-        var fbs = new ADict<String, BufferedReader>();
+        var fbs = new ADict<CloneableString, CloneableBufferedReader>();
         var heap = new Heap();
         var prg = new PrgState(stk, st, out, fbs, heap, comp);
         var repo = new StateRepo(prg,logFile);
@@ -49,6 +47,8 @@ public class Interpreter {
 
 
     public static void main(String[] args) throws Exception {
+
+
         var source1 = "int v; int m; v=2; m=3; v=(v+m); nop; print(v); print(m)";
         var source2 = "bool a; a=true; int v; if a then v=2 else v=3; print(v)";
         var source3 = "int a; a=(2+(3*5)); int b; b=((a-(4/2)) + 7); print(b)";
@@ -67,6 +67,9 @@ public class Interpreter {
         var sourceGC1 = "Ref int v; Ref int c; new(c,200);new(v,20);Ref Ref int a; new(a,v); new(v,30);print(rH(rH(a)));new(a,c)";
         var sourceGC2 = "Ref int v; Ref Ref Ref int c;new(v,20);Ref Ref int a; new(a,v);new(c,a); new(v,30);print(rH(rH(rH(c))))";
         var sourcewhile = "int v; v=4; while ((v>0)){ print(v);v=(v-1);print(v)}";
+        var sourceFork = "int v; Ref int a; v=10;new(a,22);\n" + //
+                        "fork({wH(a,30);v=32;print(v);print(rH(a))});\n" + //
+                        "print(v);print(rH(a))";
 
         var textMenu = new TextMenu();
 
@@ -81,6 +84,7 @@ public class Interpreter {
         command(textMenu, "prgGC1.log", "GC1", "GC program 1", sourceGC1);
         command(textMenu, "prgGC2.log", "GC2", "GC program 2", sourceGC2);
         command(textMenu, "prgwhile.log", "while", "while program", sourcewhile);
+        command(textMenu, "prgFork.log", "fork", "fork program", sourceFork);
 
         textMenu.addCommand(new ExitCommand("exit", "exit program"));
 

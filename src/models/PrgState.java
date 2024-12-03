@@ -1,40 +1,47 @@
 package models;
 
-import java.io.BufferedReader;
 import java.util.stream.Collectors;
 
 import exceptions.ExecutionException;
 import models.adt.ADict;
 import models.adt.AList;
 import models.adt.AStack;
+import models.adt.CloneableBufferedReader;
+import models.adt.CloneableString;
 import models.adt.Heap;
+import models.adt.IDict;
+import models.adt.IHeap;
+import models.adt.IList;
+import models.adt.IStack;
 import models.statements.IStmt;
+import models.types.IntType;
 import models.values.IValue;
 
 public class PrgState {
-    private AStack<IStmt> exeStack;
+    private IStack<IStmt> exeStack;
     
-    private ADict<String, IValue> symTable;
+    private IDict<CloneableString, IValue> symTable;
     
-    private AList<IValue> out;
+    private IList<IValue> out;
 
-    private ADict<String, BufferedReader> fileTable;
+    private IDict<CloneableString, CloneableBufferedReader> fileTable;
 
-    private Heap heap;
+    private IHeap heap;
 
-    private static int id;
+    private int id;
+    private static int nextId = 0;
 
     IStmt originalProgram;
     
-    public AStack<IStmt> getExeStack() {
+    public IStack<IStmt> getExeStack() {
         return exeStack;
     }
 
-    public ADict<String, IValue> getSymTable() {
+    public IDict<CloneableString, IValue> getSymTable() {
         return symTable;
     }
 
-    public AList<IValue> getOut() {
+    public IList<IValue> getOut() {
         return out;
     }
 
@@ -42,7 +49,7 @@ public class PrgState {
         return originalProgram;
     }
 
-    public Heap getHeap() {
+    public IHeap getHeap() {
         return heap;
     }
 
@@ -50,7 +57,7 @@ public class PrgState {
         this.exeStack = exeStack;
     }
 
-    public void setSymTable(ADict<String, IValue> symTable) {
+    public void setSymTable(ADict<CloneableString, IValue> symTable) {
         this.symTable = symTable;
     }
 
@@ -66,20 +73,20 @@ public class PrgState {
         this.originalProgram = originalProgram;
     }
 
-    public ADict<String, BufferedReader> getFileTable() {
+    public IDict<CloneableString, CloneableBufferedReader> getFileTable() {
         return fileTable;
     }
 
-    public void setFileTable(ADict<String, BufferedReader> fileTable) {
+    public void setFileTable(ADict<CloneableString, CloneableBufferedReader> fileTable) {
         this.fileTable = fileTable;
     }
 
-    public static synchronized int getId() {
-        return id;
+    public static synchronized int getNextId() {
+        return ++PrgState.nextId;
     }
 
-    public PrgState(int id, AStack<IStmt> exeStack, ADict<String, IValue> symTable, AList<IValue> out, ADict<String, BufferedReader> fbs, Heap heap, IStmt program) {
-        PrgState.id = id;
+    public PrgState(IStack<IStmt> exeStack, IDict<CloneableString, IValue> symTable, IList<IValue> out, IDict<CloneableString, CloneableBufferedReader> fbs, IHeap heap, IStmt program) {
+        this.id = PrgState.getNextId();
         this.exeStack = exeStack;
         this.symTable = symTable;
         this.out = out;
@@ -111,13 +118,13 @@ public class PrgState {
         }
 
         return
-        "State:"
-        + Integer.toString(PrgState.id)
+        "State id:"
+        + Integer.toString(this.id)
         +"\nExeStack:\n"
         + s.toString()
         + "SymTable:\n"
         + symTable.toString()
-        + "Out:\n"
+        + "\nOut:\n"
         + out.toString()
         + "File Table:\n"
         + fileTable.keys().toString()

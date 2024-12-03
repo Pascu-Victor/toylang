@@ -1,6 +1,7 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
 import models.types.IntType;
@@ -19,7 +20,7 @@ public class RelExp implements IExp {
         this.op = op;
     }
 
-    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
+    public IValue eval(IDict<CloneableString, IValue> symTable, IHeap heap) throws ExecutionException {
         IValue lhsVal = lhs.eval(symTable, heap);
         if(!lhsVal.getType().equals(new IntType())) {
             throw new ExecutionException("Invalid type for lhs, got: " + lhsVal.getType().toString());

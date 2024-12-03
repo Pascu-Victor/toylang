@@ -1,5 +1,7 @@
 package models.adt;
 
+import java.util.stream.Stream;
+
 public interface IList<T> {
     void add(T elem);
     void remove(T elem);
@@ -7,4 +9,5 @@ public interface IList<T> {
     int size();
     T get(int index);
     String toString();
+    Stream<T> stream();
 }

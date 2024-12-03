@@ -215,6 +215,8 @@ public class ProgLexer {
                 return newStmt();
             case "wH":
                 return whStmt();
+            case "fork":
+                return forkStmt();
             default:
                 return assignStmt();
         }
@@ -347,6 +349,18 @@ public class ProgLexer {
         IStmt stmts = consumeCodeBlock();
         skipWhitespace();
         return new WhileStmt(condExp, stmts);
+    }
+
+    private ForkStmt forkStmt() {
+        consumeKeyword("fork");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        IStmt subprogram = consumeCodeBlock();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        return new ForkStmt(subprogram);
     }
 
     private NewStmt newStmt() {

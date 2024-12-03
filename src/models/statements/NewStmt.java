@@ -2,21 +2,27 @@ package models.statements;
 
 import exceptions.ExecutionException;
 import models.PrgState;
+import models.adt.CloneableString;
 import models.expressions.IExp;
 import models.types.RefType;
 import models.values.IValue;
 import models.values.RefValue;
 
 public class NewStmt implements IStmt {
-    private String varName;
+    private CloneableString varName;
     private IExp exp;
 
-    public NewStmt(String varName, IExp exp) {
+    public NewStmt(CloneableString varName, IExp exp) {
         this.varName = varName;
         this.exp = exp;
     }
 
-    public String getVarName() {
+    public NewStmt(String varName, IExp exp) {
+        this.varName = new CloneableString(varName);
+        this.exp = exp;
+    }
+
+    public CloneableString getVarName() {
         return varName;
     }
 
@@ -30,7 +36,7 @@ public class NewStmt implements IStmt {
     }
 
     public IStmt deepCopy() {
-        return new NewStmt(varName, exp);
+        return new NewStmt(varName.deepCopy(), exp.deepCopy());
     }
 
     public PrgState execute(PrgState state) throws ExecutionException {
@@ -44,6 +50,6 @@ public class NewStmt implements IStmt {
         var type = ((RefType)ref.getType()).getInner();
         state.getSymTable().set(varName, new RefValue(addr, type));
         
-        return state;
+        return null;
     }
 }

@@ -1,10 +1,11 @@
 package models.adt;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
+public class ADict<TKey extends ICloneable, TVal extends ICloneable> implements IDict<TKey, TVal> {
     private Map<TKey, TVal> dict;
 
     public void set(TKey key, TVal value) {
@@ -31,13 +32,27 @@ public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
         dict = new java.util.HashMap<TKey, TVal>();
     }
 
+    public ADict(Map<TKey,TVal> data) {
+        this.dict = data;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IDict<TKey, TVal> deepCopy() {
+        var hm = new HashMap<TKey,TVal>();
+        for(var i : dict.entrySet()){
+            hm.put((TKey)i.getKey().deepCopy(), (TVal)i.getValue().deepCopy());
+        }
+        return new ADict<>(hm);
+    }
+
     public String toString() {
         return dict.entrySet().stream()
         .map(e -> e.getKey() + "-->" + e.getValue())
         .collect(Collectors.joining("\n"));
     }
 
-    public AList<TKey> keys() {
+    public IList<TKey> keys() {
         var keys = new AList<TKey>();
         for (Map.Entry<TKey,TVal> entry : dict.entrySet()) {
             keys.add(entry.getKey());

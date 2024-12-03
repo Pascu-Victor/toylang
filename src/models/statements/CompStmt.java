@@ -27,6 +27,6 @@ public class CompStmt implements IStmt {
         }
         state.getExeStack().push(rhs);
         state.getExeStack().push(lhs);
-        return state;
+        return null;
     }
 }

@@ -12,20 +12,14 @@ import models.PrgState;
 
 public class StateRepo implements IStateRepo {
     private List<PrgState> states;
-    private int size;
-    private int crtPrg;
     private String logFilePath;
 
     public StateRepo() {
         this.states = new ArrayList<>();
-        this.size = 0;
-        this.crtPrg = 0;
     }
 
     public StateRepo(PrgState state, String logFile) {
         this.states = new ArrayList<>();
-        this.size = 1;
-        this.crtPrg = 0;
         this.states.add(state);
         this.logFilePath = logFile;
     }

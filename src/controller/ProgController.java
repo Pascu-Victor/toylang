@@ -3,6 +3,9 @@ package controller;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,6 +22,7 @@ public class ProgController implements IProgController {
     IStateRepo repo;
     Consumer<String> callback;
     boolean display = false;
+    ExecutorService executor;
 
     public ProgController(IStateRepo repo) {
         this.repo = repo;
@@ -57,22 +61,77 @@ public class ProgController implements IProgController {
         }
         return Stream.of(addr);
     }
+    
+    private void runGcOnAll(List<PrgState> states) {
+        List<IValue> allSymbols = states.stream()
+            .map(s -> s.getSymTable().values().stream())
+            .flatMap(s -> s)
+            .toList();
+        states.getFirst().getHeap().setContent(
+            safeGarbageCollector(
+                getAddr(allSymbols, states.getFirst().getHeap()),
+                states.getFirst().getHeap()
+            )
+        );
+    }
+
+    List<PrgState> removeCompletedPrg(List<PrgState> states) {
+        return states.stream().filter(s -> s.isNotCompleted()).toList();
+    }
+
+    public void oneStepForAllPrg(List<PrgState> states) throws ExecutionException {
+        states.forEach(s -> {
+            try {
+                repo.logPrgStateExec(s);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        List<Callable<PrgState>> callList = states.stream()
+            .map(s -> ((Callable<PrgState>)(()->s.oneStep())))
+            .toList();
         
+        try {
+            List<PrgState> newPrgStates = executor.invokeAll(callList).stream()
+                .map(future -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .filter(s -> s!=null)
+                .toList();
+            
+                states = Stream.concat(
+                    states.stream(),
+                    newPrgStates.stream()
+                    ).toList();
+                states.forEach(s -> {
+                    try {
+                        repo.logPrgStateExec(s);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                repo.setPrgList(states);
+        } catch (InterruptedException e) {
+            throw new ExecutionException("Interrupted" + e.toString());
+        }
+    }
 
     public void allStep() throws ExecutionException {
-        var prog = repo.getCrtPrg();
-        repo.logPrgStateExec();
-        while (!prog.getExeStack().isEmpty()) {
-            this.oneStep(prog);
-            repo.logPrgStateExec();
-            prog.getHeap().setContent(
-                safeGarbageCollector(
-                    getAddr(prog.getSymTable().values(),prog.getHeap()),
-                    prog.getHeap()
-                )
-            );
-            repo.logPrgStateExec();
+        this.executor = Executors.newFixedThreadPool(2);
+        // repo.logPrgStateExec();
+        List<PrgState> prgList = removeCompletedPrg(repo.getPrgList());
+        while (!prgList.isEmpty()) {
+            runGcOnAll(prgList);
+            oneStepForAllPrg(prgList);
+            prgList = removeCompletedPrg(repo.getPrgList());
         }
+        executor.shutdownNow();
+        repo.setPrgList(prgList);
     }
 
     public void toggleDisplayState() {

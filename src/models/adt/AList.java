@@ -2,6 +2,7 @@ package models.adt;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AList<T> implements IList<T> {
     private ArrayList<T> list;
@@ -34,5 +35,9 @@ public class AList<T> implements IList<T> {
 
     public T get(int index) {
         return list.get(index);
+    }
+
+    public Stream<T> stream() {
+        return list.stream();
     }
 }

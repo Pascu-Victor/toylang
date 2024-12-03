@@ -1,16 +1,21 @@
 package models.values;
 
+import models.adt.CloneableString;
 import models.types.IType;
 import models.types.StringType;
 
 public class StringValue implements IValue {
-    String val;
+    CloneableString val;
 
-    public StringValue(String val) {
+    public StringValue(CloneableString val) {
         this.val = val;
     }
 
-    public String getVal() {
+    public StringValue(String val) {
+        this.val = new CloneableString(val);
+    }
+
+    public CloneableString getVal() {
         return val;
     }
 
@@ -19,7 +24,7 @@ public class StringValue implements IValue {
     }
 
     public IValue deepCopy() {
-        return new StringValue(val);
+        return new StringValue(val.deepCopy());
     }
 
     @Override

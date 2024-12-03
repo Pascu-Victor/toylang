@@ -1,6 +1,7 @@
 package models.adt;
 
 import java.util.Set;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import exceptions.ExecutionException;
@@ -46,6 +47,7 @@ public interface IHeap {
     int addRef(int addr);
     int remRef(int addr);
     int refcount(int addr);
+    void setContent(Map<Integer, HeapEntry> content);
     public boolean contains(int addr);
     Set<Entry<Integer, HeapEntry>> entrySet();
 }

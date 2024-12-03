@@ -30,7 +30,7 @@ public class CloseRFileStmt implements IStmt {
         catch (Exception e) {
             throw new ExecutionException("Error closing file");
         }
-        return state;
+        return null;
     }
 
     @Override

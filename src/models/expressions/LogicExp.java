@@ -1,6 +1,7 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
 import models.values.BoolValue;
@@ -17,7 +18,7 @@ public class LogicExp implements IExp {
         this.op = op;
     }
 
-    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
+    public IValue eval(IDict<CloneableString, IValue> symTable, IHeap heap) throws ExecutionException {
         IValue v1 = exp1.eval(symTable, heap);
         IValue v2 = exp2.eval(symTable, heap);
 

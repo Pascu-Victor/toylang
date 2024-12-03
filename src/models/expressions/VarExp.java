@@ -1,18 +1,23 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
 import models.values.IValue;
 
 public class VarExp implements IExp {
-    String id;
+    CloneableString id;
 
-    public VarExp(String id) {
+    public VarExp(CloneableString id) {
         this.id = id;
     }
 
-    public IValue eval(IDict<String, IValue> symTable, IHeap heap) throws ExecutionException {
+    public VarExp(String id) {
+        this.id = new CloneableString(id);
+    }
+
+    public IValue eval(IDict<CloneableString, IValue> symTable, IHeap heap) throws ExecutionException {
         return symTable.get(id);
     }
 
@@ -21,7 +26,7 @@ public class VarExp implements IExp {
     }
 
     public String toString() {
-        return id;
+        return id.toString();
     }
 
 }

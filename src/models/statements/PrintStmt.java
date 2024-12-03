@@ -21,7 +21,7 @@ public class PrintStmt implements IStmt {
         }
         IList<IValue> out = state.getOut();
         out.add(exp.eval(state.getSymTable(), state.getHeap()));
-        return state;
+        return null;
     }
 
     public PrintStmt(IExp exp) {

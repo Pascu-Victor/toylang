@@ -6,6 +6,8 @@ import java.io.FileReader;
 
 import exceptions.ExecutionException;
 import models.PrgState;
+import models.adt.CloneableBufferedReader;
+import models.adt.CloneableString;
 import models.expressions.IExp;
 import models.types.StringType;
 import models.values.IValue;
@@ -22,14 +24,14 @@ public class OpenRFileStmt implements IStmt{
     public PrgState execute(PrgState state) throws ExecutionException {
         IValue val = filename.eval(state.getSymTable(), state.getHeap());
         if (val.getType() instanceof StringType) {
-            String str = ((StringValue)val).getVal();
+            CloneableString str = ((StringValue)val).getVal();
             if (state.getFileTable().containsKey(str)) {
                 throw new ExecutionException("File already opened");
             }
             try { 
-                var fb = new BufferedReader(
-                    new FileReader(str)
-                );
+                var fb = new CloneableBufferedReader( new BufferedReader(
+                    new FileReader(str.toString())
+                ));
 
                 state.getFileTable().set(str, fb);
 
@@ -41,7 +43,7 @@ public class OpenRFileStmt implements IStmt{
         } else {
             throw new ExecutionException("Filename is not a string");
         }
-        return state;
+        return null;
     }
 
     public IStmt deepCopy() {

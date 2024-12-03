@@ -32,7 +32,7 @@ public class IfStmt implements IStmt {
             } else {
                 state.getExeStack().push(elseS);
             }
-            return state;
+            return null;
         }
         if(r == null)
             throw new ExecutionException("Invalid IfStmt: Expression evaluation returned null");

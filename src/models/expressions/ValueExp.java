@@ -1,5 +1,6 @@
 package models.expressions;
 
+import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
 import models.values.IValue;
@@ -11,7 +12,7 @@ public class ValueExp implements IExp {
         this.value = value;
     }
 
-    public IValue eval(IDict<String, IValue> symTable, IHeap heap) {
+    public IValue eval(IDict<CloneableString, IValue> symTable, IHeap heap) {
         return value;
     }
 
