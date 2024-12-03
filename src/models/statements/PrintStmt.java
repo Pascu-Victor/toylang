@@ -1,9 +1,13 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
+import models.adt.CloneableString;
+import models.adt.IDict;
 import models.adt.IList;
 import models.expressions.IExp;
+import models.types.IType;
 import models.values.IValue;
 
 public class PrintStmt implements IStmt {
@@ -31,5 +35,11 @@ public class PrintStmt implements IStmt {
     @Override
     public IStmt deepCopy() {
         return new PrintStmt(exp.deepCopy());
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        exp.typecheck(typeEnvironment);
+        return typeEnvironment;
     }
 }

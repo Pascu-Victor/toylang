@@ -1,9 +1,12 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.CloneableString;
+import models.adt.IDict;
 import models.expressions.IExp;
+import models.types.IType;
 import models.types.RefType;
 import models.values.IValue;
 import models.values.RefValue;
@@ -51,5 +54,16 @@ public class NewStmt implements IStmt {
         state.getSymTable().set(varName, new RefValue(addr, type));
         
         return null;
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        var expType = exp.typecheck(typeEnvironment);
+        var varType = typeEnvironment.get(varName);
+
+        if(!varType.equals(new RefType(expType))) {
+            throw new TypeException("NewStmt: invalid assignment of exp: " + expType + " to heap ref: " + varType);
+        }
+        return typeEnvironment;
     }
 }

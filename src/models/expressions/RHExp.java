@@ -1,9 +1,12 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
+import models.types.IType;
+import models.types.RefType;
 import models.values.IValue;
 import models.values.RefValue;
 
@@ -32,4 +35,12 @@ public class RHExp implements IExp {
         return "rH(" + ref.toString() + ")";
     }
 
+    @Override
+    public IType typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        IType tref = ref.typecheck(typeEnvironment);
+        if(!(tref instanceof RefType)) {
+            throw new TypeException("Expected RefType, got: " + tref);
+        }
+        return ((RefType) tref).getInner();
+    }
 }

@@ -3,9 +3,13 @@ package models.statements;
 import java.io.IOException;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.CloneableString;
+import models.adt.IDict;
 import models.expressions.IExp;
+import models.types.IType;
+import models.types.IntType;
 import models.types.StringType;
 import models.values.IValue;
 import models.values.IntValue;
@@ -58,4 +62,15 @@ public class ReadFileStmt implements IStmt {
         return "readFile(" + varName + ", " + fileName + ")";
     }
     
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        var typeExp = fileName.typecheck(typeEnvironment);
+        if (!typeExp.equals(new StringType())) {
+            throw new TypeException("File name must be a string");
+        }
+        if (!typeEnvironment.get(varName).equals(new IntType())) {
+            throw new TypeException("Variable must be an integer");
+        }
+        return typeEnvironment;
+    }
 }

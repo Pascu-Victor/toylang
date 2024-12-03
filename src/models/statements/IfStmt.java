@@ -1,8 +1,13 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
+import models.adt.CloneableString;
+import models.adt.IDict;
 import models.expressions.IExp;
+import models.types.BoolType;
+import models.types.IType;
 import models.values.BoolValue;
 
 public class IfStmt implements IStmt {
@@ -43,4 +48,14 @@ public class IfStmt implements IStmt {
         return new IfStmt(exp.deepCopy(), thenS.deepCopy(), elseS.deepCopy());
     }
     
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        IType expType = exp.typecheck(typeEnvironment);
+        if (!expType.equals(new BoolType())) {
+            throw new TypeException("IfStmt: Expression type is not BoolType, got: " + expType);
+        }
+        thenS.typecheck(typeEnvironment.deepCopy());
+        elseS.typecheck(typeEnvironment.deepCopy());
+        return typeEnvironment;
+    }
 }

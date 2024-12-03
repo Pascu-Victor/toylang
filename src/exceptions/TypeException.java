@@ -1,7 +1,7 @@
 package exceptions;
 
-public class ExecutionException extends Exception {
-    public ExecutionException(String message) {
+public class TypeException extends Exception {
+    public TypeException(String message) {
         super(message);
     }
     

@@ -1,9 +1,11 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
+import models.types.IType;
 import models.types.IntType;
 import models.values.IValue;
 import models.values.IntValue;
@@ -58,5 +60,18 @@ public class ArithExp implements IExp {
     @Override
     public String toString() {
         return lhs.toString() + " " + op.toString() + " " + rhs.toString();
+    }
+
+    @Override
+    public IType typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        IType tlhs = lhs.typecheck(typeEnvironment);
+        IType trhs = rhs.typecheck(typeEnvironment);
+        if(!tlhs.equals(new IntType())) {
+            throw new TypeException("Rhs operand is not of type IntType, got: " + trhs);
+        }
+        if (!trhs.equals(new IntType())) {
+            throw new TypeException("Rhs operand is not of type IntType, got: " + trhs);
+        }
+        return new IntType();
     }
 }

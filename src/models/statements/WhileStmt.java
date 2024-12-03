@@ -1,9 +1,13 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
+import models.adt.CloneableString;
+import models.adt.IDict;
 import models.expressions.IExp;
 import models.types.BoolType;
+import models.types.IType;
 import models.values.BoolValue;
 import models.values.IValue;
 
@@ -38,6 +42,16 @@ public class WhileStmt implements IStmt {
         }
 
         return null;
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        IType condType = condExp.typecheck(typeEnvironment);
+        if (!condType.equals(new BoolType())) {
+            throw new TypeException("While condition must be a boolean");
+        }
+        stmts.typecheck(typeEnvironment);
+        return typeEnvironment;
     }
 
 }

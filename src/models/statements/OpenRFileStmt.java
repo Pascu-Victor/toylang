@@ -5,10 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.CloneableBufferedReader;
 import models.adt.CloneableString;
+import models.adt.IDict;
 import models.expressions.IExp;
+import models.types.IType;
 import models.types.StringType;
 import models.values.IValue;
 import models.values.StringValue;
@@ -53,5 +56,14 @@ public class OpenRFileStmt implements IStmt{
     @Override
     public String toString() {
         return "openRFile(" + filename + ")";
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        var expType = filename.typecheck(typeEnvironment);
+        if(!expType.equals(new StringType())) {
+            throw new TypeException("OpenRFile: expected type StringType, got: " + expType);
+        }
+        return typeEnvironment;
     }
 }

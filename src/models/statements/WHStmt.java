@@ -1,9 +1,12 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.CloneableString;
+import models.adt.IDict;
 import models.expressions.IExp;
+import models.types.IType;
 import models.types.RefType;
 import models.values.IValue;
 import models.values.RefValue;
@@ -69,5 +72,21 @@ public class WHStmt implements IStmt {
     @Override
     public IStmt deepCopy() {
         return new WHStmt(varName, exp.deepCopy());
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        var expType = exp.typecheck(typeEnvironment);
+        var varType = typeEnvironment.get(varName);
+
+        if(!(varType instanceof RefType)) {
+            throw new TypeException("var: " + varName + " not instance of type RefType, got: " + varType);
+        }
+        
+        if(!varType.equals(new RefType(expType))) {
+            throw new TypeException("var: " + varName + " does not match expression type: " +expType);
+        }
+
+        return typeEnvironment;
     }
 }

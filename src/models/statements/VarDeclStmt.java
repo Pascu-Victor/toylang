@@ -1,8 +1,10 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.CloneableString;
+import models.adt.IDict;
 import models.types.IType;
 
 public class VarDeclStmt implements IStmt {
@@ -31,4 +33,9 @@ public class VarDeclStmt implements IStmt {
         return new VarDeclStmt(name, type);
     }
 
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        typeEnvironment.set(name, type);
+        return typeEnvironment;
+    }
 }

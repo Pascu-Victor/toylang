@@ -1,9 +1,12 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
+import models.types.BoolType;
+import models.types.IType;
 import models.types.IntType;
 import models.values.BoolValue;
 import models.values.IValue;
@@ -60,6 +63,19 @@ public class RelExp implements IExp {
     @Override
     public String toString() {
         return lhs.toString() + " " + op.toString() + " " + rhs.toString();
+    }
+
+    @Override
+    public IType typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        IType tlhs = lhs.typecheck(typeEnvironment);
+        IType trhs = rhs.typecheck(typeEnvironment);
+        if(!tlhs.equals(new IntType())) {
+            throw new TypeException("Invalid type for lhs expected BoolType, got: " + tlhs.toString());
+        }
+        if (!trhs.equals(new IntType())) {
+            throw new TypeException("Invalid type for rhs expected BoolType, got: " + trhs.toString());
+        }
+        return new BoolType();
     }
 
 }

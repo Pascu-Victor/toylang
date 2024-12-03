@@ -1,9 +1,12 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
+import models.types.BoolType;
+import models.types.IType;
 import models.values.BoolValue;
 import models.values.IValue;
 
@@ -42,5 +45,21 @@ public class LogicExp implements IExp {
 
     public String toString() {
         return exp1.toString() + " " + op + " " + exp2.toString();
+    }
+
+    @Override
+    public IType typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        IType t1 = exp1.typecheck(typeEnvironment);
+        IType t2 = exp2.typecheck(typeEnvironment);
+
+        if (!t1.equals(new BoolType())) {
+            throw new TypeException("Invalid type for lhs, got: " + t1.toString());
+        }
+
+        if (!t2.equals(new BoolType())) {
+            throw new TypeException("Invalid type for rhs, got: " + t2.toString());
+        }
+
+        return new BoolType();
     }
 }

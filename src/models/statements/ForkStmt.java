@@ -1,8 +1,12 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.AStack;
+import models.adt.CloneableString;
+import models.adt.IDict;
+import models.types.IType;
 
 public class ForkStmt implements IStmt {
     IStmt subprogram;
@@ -25,5 +29,11 @@ public class ForkStmt implements IStmt {
     @Override
     public String toString() {
         return "fork("+subprogram+")";
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        subprogram.typecheck(typeEnvironment.deepCopy());
+        return typeEnvironment;
     }
 }

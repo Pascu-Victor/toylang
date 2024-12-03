@@ -1,7 +1,11 @@
 package models.statements;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.PrgState;
+import models.adt.CloneableString;
+import models.adt.IDict;
+import models.types.IType;
 
 public class CompStmt implements IStmt {
     IStmt lhs;
@@ -28,5 +32,10 @@ public class CompStmt implements IStmt {
         state.getExeStack().push(rhs);
         state.getExeStack().push(lhs);
         return null;
+    }
+
+    @Override
+    public IDict<CloneableString, IType> typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        return rhs.typecheck(lhs.typecheck(typeEnvironment));
     }
 }

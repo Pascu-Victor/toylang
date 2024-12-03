@@ -1,9 +1,11 @@
 package models.expressions;
 
 import exceptions.ExecutionException;
+import exceptions.TypeException;
 import models.adt.CloneableString;
 import models.adt.IDict;
 import models.adt.IHeap;
+import models.types.IType;
 import models.values.IValue;
 
 public class VarExp implements IExp {
@@ -29,4 +31,8 @@ public class VarExp implements IExp {
         return id.toString();
     }
 
+    @Override
+    public IType typecheck(IDict<CloneableString, IType> typeEnvironment) throws TypeException {
+        return typeEnvironment.get(id);
+    }
 }

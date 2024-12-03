@@ -28,4 +28,9 @@ public class RefType implements IType {
     public IValue defaultValue() {
         return new RefValue(0, inner);
     }
+
+    @Override
+    public IType deepCopy() {
+        return new RefType(inner.deepCopy());
+    }
 }

@@ -1,9 +1,11 @@
 import controller.IProgController;
 import controller.ProgController;
+import exceptions.TypeException;
 import models.PrgState;
 import models.adt.*;
 import models.statements.CompStmt;
 import models.statements.IStmt;
+import models.types.IType;
 import models.values.*;
 import repo.StateRepo;
 import view.ProgLexer;
@@ -13,7 +15,7 @@ import view.commands.RunExampleCommand;
 
 public class Interpreter {
 
-    private static IProgController parseProgram(String source, String logFile) {
+    private static IProgController parseProgram(String source, String logFile) throws TypeException{
         var lexer = new ProgLexer(source);
         var stmts = new AList<IStmt>();
         while (true) {
@@ -29,6 +31,11 @@ public class Interpreter {
             comp = new CompStmt(stmts.get(i), comp);
         }
 
+        var typeEnv = new ADict<CloneableString, IType>();
+
+        comp.typecheck(typeEnv);
+        
+
         var stk = new AStack<IStmt>();
         var st = new ADict<CloneableString, IValue>();
         var out = new AList<IValue>();
@@ -40,9 +47,14 @@ public class Interpreter {
     }
 
     private static void command(TextMenu menu, String logName, String progKey, String progDesc, String src) {
-        var c = parseProgram(src, logName);
-        var command = new RunExampleCommand(progKey, progDesc, c);
-        menu.addCommand(command);
+        try {
+            var c = parseProgram(src, logName);
+            var command = new RunExampleCommand(progKey, progDesc, c);
+            menu.addCommand(command);
+        }
+        catch(TypeException e) {
+            System.err.println("ERROR: in program \""+progKey+"\" got error:\n" + e.toString());
+        }
     }
 
 
@@ -70,6 +82,7 @@ public class Interpreter {
         var sourceFork = "int v; Ref int a; v=10;new(a,22);\n" + //
                         "fork({wH(a,30);v=32;print(v);print(rH(a))});\n" + //
                         "print(v);print(rH(a))";
+        var sourceInvalidType = "int v; v=\"123\"";
 
         var textMenu = new TextMenu();
 
@@ -85,6 +98,7 @@ public class Interpreter {
         command(textMenu, "prgGC2.log", "GC2", "GC program 2", sourceGC2);
         command(textMenu, "prgwhile.log", "while", "while program", sourcewhile);
         command(textMenu, "prgFork.log", "fork", "fork program", sourceFork);
+        command(textMenu, "prgInvalid.log", "invalid", "invalid program", sourceInvalidType);
 
         textMenu.addCommand(new ExitCommand("exit", "exit program"));
 
