@@ -10,7 +10,6 @@ public class ForkStmt implements IStmt {
     @Override
     public PrgState execute(PrgState state) throws ExecutionException {
         var stk = new AStack<IStmt>();
-        stk.push(subprogram);
         return new PrgState(stk, state.getSymTable().deepCopy(), state.getOut(), state.getFileTable(), state.getHeap(), subprogram);
     }
 
