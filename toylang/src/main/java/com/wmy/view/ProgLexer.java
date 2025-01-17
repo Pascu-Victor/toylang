@@ -2,7 +2,10 @@ package com.wmy.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import com.wmy.models.adt.AList;
 import com.wmy.models.expressions.*;
 import com.wmy.models.statements.*;
 import com.wmy.models.types.*;
@@ -36,11 +39,11 @@ public class ProgLexer {
 
     private void skipComment() {
         skipWhitespace();
-        if(currentChar == '/') {
+        if (currentChar == '/') {
             int oldPos = pos;
             char oldChar = currentChar;
             advance();
-            if(currentChar != '/') {
+            if (currentChar != '/') {
                 pos = oldPos;
                 currentChar = oldChar;
                 return;
@@ -155,16 +158,16 @@ public class ProgLexer {
         }
         switch (lookaheadToken()) {
             case "int":
-            consumeKeyword("int");
-            return new IntType();
+                consumeKeyword("int");
+                return new IntType();
             case "bool":
-            consumeKeyword("bool");
-            return new BoolType();
+                consumeKeyword("bool");
+                return new BoolType();
             case "string":
-            consumeKeyword("string");
-            return new StringType();
+                consumeKeyword("string");
+                return new StringType();
             default:
-            throw new RuntimeException("Unexpected type: " + lookaheadToken());
+                throw new RuntimeException("Unexpected type: " + lookaheadToken());
         }
     }
 
@@ -217,6 +220,8 @@ public class ProgLexer {
                 return whStmt();
             case "fork":
                 return forkStmt();
+            case "switch":
+                return switchStmt();
             default:
                 return assignStmt();
         }
@@ -253,7 +258,7 @@ public class ProgLexer {
         skipWhitespace();
         consume('=');
         skipWhitespace();
-        if(currentChar == '"') {
+        if (currentChar == '"') {
             advance();
             StringBuilder result = new StringBuilder();
             while (currentChar != '\0' && currentChar != '"') {
@@ -324,7 +329,7 @@ public class ProgLexer {
         while (currentChar != '}') {
             IStmt stmt = statement();
             if (stmt != null) {
-            stmts.add(stmt);
+                stmts.add(stmt);
             }
             skipWhitespace();
         }
@@ -361,6 +366,47 @@ public class ProgLexer {
         consume(')');
         skipWhitespace();
         return new ForkStmt(subprogram);
+    }
+
+    private SwitchStmt switchStmt() {
+        consumeKeyword("switch");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        IExp swExp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        consume('{');
+        skipWhitespace();
+        var cases = new AList<Entry<IExp, IStmt>>();
+        IStmt defaultStmt = null;
+        while (currentChar != '}') {
+            // can be case or default
+            skipWhitespace();
+            if (lookaheadToken().equals("case")) {
+                consumeKeyword("case");
+                skipWhitespace();
+                consume('(');
+                skipWhitespace();
+                IExp caseExp = expression();
+                skipWhitespace();
+                consume(')');
+                skipWhitespace();
+                IStmt caseStmt = consumeCodeBlock();
+                skipWhitespace();
+                cases.add(Map.entry(caseExp, caseStmt));
+            } else {
+                consumeKeyword("default");
+                skipWhitespace();
+                defaultStmt = consumeCodeBlock();
+                skipWhitespace();
+            }
+        }
+        skipWhitespace();
+        consume('}');
+        skipWhitespace();
+        return new SwitchStmt(swExp, cases, defaultStmt);
     }
 
     private NewStmt newStmt() {
@@ -465,15 +511,15 @@ public class ProgLexer {
             result.append(currentChar);
             advance();
             if (currentChar == '=') {
-            result.append(currentChar);
-            advance();
+                result.append(currentChar);
+                advance();
             }
         }
         pos = oldPos;
         currentChar = oldChar;
         return result.toString().trim();
     }
-    
+
     private OpEnum operator() {
         skipWhitespace();
         switch (currentChar) {
@@ -495,8 +541,7 @@ public class ProgLexer {
             case '|':
                 consumeOperator(OpEnum.OR);
                 return OpEnum.OR;
-            case '<':
-            {
+            case '<': {
                 var tk = lookaheadOperator();
                 switch (tk) {
                     case "<":
@@ -509,8 +554,7 @@ public class ProgLexer {
                         throw new RuntimeException("Unexpected operator: " + currentChar);
                 }
             }
-            case '>':
-            {
+            case '>': {
                 var tk = lookaheadOperator();
                 switch (tk) {
                     case ">":
@@ -523,19 +567,17 @@ public class ProgLexer {
                         throw new RuntimeException("Unexpected operator: " + currentChar);
                 }
             }
-            case '=':
-            {
+            case '=': {
                 var tk = lookaheadOperator();
-                if(tk.equals("==")) {
+                if (tk.equals("==")) {
                     consumeOperator(OpEnum.EQUAL);
                     return OpEnum.EQUAL;
                 }
                 throw new RuntimeException("Unexpected operator: " + currentChar);
             }
-            case '!':
-            {
+            case '!': {
                 var tk = lookaheadOperator();
-                if(tk.equals("!=")) {
+                if (tk.equals("!=")) {
                     consumeOperator(OpEnum.NOTEQ);
                     return OpEnum.NOTEQ;
                 }

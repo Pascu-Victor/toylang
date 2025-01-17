@@ -106,6 +106,8 @@ public class Interpreter extends Application {
                 "fork({wH(a,30);v=32;print(v);print(rH(a))});\n" + //
                 "fork({wH(a,30);v=32;print(v);print(rH(a))});\n" + //
                 "print(v);print(rH(a))";
+        var sourceSwitchExp = "int v; v=10; switch(v) { case(1) { print(1) } case(2) { print(2) } default { print(3) } }";
+        var sourceSwitchExpNodefault = "int v; v=10; switch(v) { case(1) { print(1) } case(3) { print(3) } }";
 
         var sourceInvalidType = "int v; v=\"123\"";
 
@@ -154,6 +156,9 @@ public class Interpreter extends Application {
         commands.add(command("prgForkFork.log", "forkfork", "fork with a fork in it", sourceForkFork));
         commands.add(command("prgForkConsec.log", "forkconsec", "two consecutive forks", sourceForkConsec));
         commands.add(command("prgInvalid.log", "invalid", "invalid program", sourceInvalidType));
+        commands.add(command("prgSwitchExp.log", "switchexp", "switch expression", sourceSwitchExp));
+        commands.add(command("prgSwitchExpNodefault.log", "switchexpnodefault", "switch expression without default",
+                sourceSwitchExpNodefault));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 
