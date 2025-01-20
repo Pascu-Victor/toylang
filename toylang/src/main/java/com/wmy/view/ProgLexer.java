@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wmy.models.adt.Entry;
+import com.wmy.models.adt.IProcTable.ProcTableEntry;
 import com.wmy.models.adt.AList;
 import com.wmy.models.adt.CloneableString;
 import com.wmy.models.expressions.*;
@@ -230,9 +231,31 @@ public class ProgLexer {
                 return awaitStmt();
             case "repeat":
                 return repeatUntilStmt();
+            case "call":
+                return callStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private CallStmt callStmt() {
+        consumeKeyword("call");
+        skipWhitespace();
+        CloneableString procName = new CloneableString(id());
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        AList<IExp> args = new AList<>();
+        while (currentChar != ')') {
+            skipWhitespace();
+            args.add(expression());
+            skipWhitespace();
+            if (currentChar == ',') {
+                advance();
+            }
+        }
+        consume(')');
+        return new CallStmt(procName, args);
     }
 
     private RepeatUntilStmt repeatUntilStmt() {
@@ -651,5 +674,33 @@ public class ProgLexer {
 
     public IStmt parse() {
         return statement();
+    }
+
+    public Entry<CloneableString, ProcTableEntry> parseProcedure() {
+        skipWhitespace();
+        consumeKeyword("procedure");
+        skipWhitespace();
+        String procName = id();
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        AList<Entry<CloneableString, IType>> params = new AList<>();
+        while (currentChar != ')') {
+            skipWhitespace();
+            IType type = parseType();
+            skipWhitespace();
+            String id = id();
+            params.add(new Entry<CloneableString, IType>(new CloneableString(id), type));
+            skipWhitespace();
+            if (currentChar == ',') {
+                advance();
+            }
+        }
+        consume(')');
+        skipWhitespace();
+        IStmt stmt = consumeCodeBlock();
+        skipWhitespace();
+        return new Entry<CloneableString, ProcTableEntry>(new CloneableString(procName),
+                new ProcTableEntry(params, stmt));
     }
 }

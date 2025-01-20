@@ -1,6 +1,8 @@
 package com.wmy.controller;
 
 import com.wmy.models.adt.Entry;
+import com.wmy.models.adt.IProcTable.ProcTableEntry;
+
 import com.wmy.exceptions.ExecutionException;
 import com.wmy.models.PrgState;
 import com.wmy.models.values.IValue;
@@ -49,6 +51,9 @@ public class ProgWindowController {
 
     @FXML
     public TableView<Entry<Integer, Integer>> latchTable;
+
+    @FXML
+    public TableView<Entry<String, ProcTableEntry>> procedureTable;
 
     @FXML
     public Button runOneStepButton;
@@ -101,6 +106,10 @@ public class ProgWindowController {
         latchTable.setItems(
                 FXCollections
                         .observableArrayList(program.getSelectedProgramStateLatchTable().entrySet().stream().toList()));
+        procedureTable.setItems(
+                FXCollections.observableArrayList(program.getSelectedProgramStateProcedureTable().entrySet().stream()
+                        .map(e -> new Entry<String, ProcTableEntry>(e.getKey().toString(), e.getValue()))
+                        .toList()));
     }
 
     @FXML
@@ -141,6 +150,24 @@ public class ProgWindowController {
         TableColumn<Entry<Integer, Integer>, Integer> latchTableValueCol = new TableColumn<>("Value");
         latchTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
         latchTable.getColumns().add(1, latchTableValueCol);
+
+        TableColumn<Entry<String, ProcTableEntry>, String> procTableProcNameCol = new TableColumn<>("Procedure");
+        procTableProcNameCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
+        procedureTable.getColumns().add(0, procTableProcNameCol);
+
+        TableColumn<Entry<String, ProcTableEntry>, String> procTableProcCodeCol = new TableColumn<>("Code");
+        procTableProcCodeCol.setCellValueFactory(p -> {
+            var pe = p.getValue().getValue();
+            var params = pe.getParams();
+            var procString = "("
+                    + params.stream().map(e -> e.getValue() + " " + e.getKey()).reduce((a, b) -> a + ", " + b)
+                            .orElse("")
+                    + ") {\n"
+                    + pe.getProcedure()
+                    + "\n}";
+            return new SimpleObjectProperty<>(procString);
+        });
+        procedureTable.getColumns().add(1, procTableProcCodeCol);
 
         this.program.getProgramStateList().addListener((ListChangeListener<PrgState>) (_) -> {
             programStateList.setItems(program.getProgramStateList());

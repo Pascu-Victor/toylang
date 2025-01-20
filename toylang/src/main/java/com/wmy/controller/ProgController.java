@@ -18,6 +18,7 @@ import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
+import com.wmy.models.adt.IProcTable;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
 import com.wmy.models.types.RefType;
@@ -206,4 +207,7 @@ public class ProgController implements IProgController {
         return selectedPrgState.getLatchTable();
     }
 
+    public IProcTable getSelectedProgramStateProcedureTable() {
+        return selectedPrgState.getProcTable();
+    }
 }

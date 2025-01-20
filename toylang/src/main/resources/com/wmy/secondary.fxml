@@ -30,6 +30,8 @@
                 <ListView fx:id="fileTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                 <Label text="Latch Table" />
                 <TableView fx:id="latchTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                <Label text="Procedure Table" />
+                <TableView fx:id="procedureTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
             </VBox>
         </HBox>
         <HBox>

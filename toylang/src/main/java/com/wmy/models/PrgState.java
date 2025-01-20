@@ -13,6 +13,8 @@ import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
+import com.wmy.models.adt.IProcTable;
+import com.wmy.models.adt.IProcTable.ProcTableEntry;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
 import com.wmy.models.values.IValue;
@@ -20,13 +22,15 @@ import com.wmy.models.values.IValue;
 public class PrgState {
     private IStack<IStmt> exeStack;
 
-    private IDict<CloneableString, IValue> symTable;
+    private IStack<IDict<CloneableString, IValue>> symTableStack;
 
     private IList<IValue> out;
 
     private IDict<CloneableString, CloneableBufferedReader> fileTable;
 
     private ILatchTable latchTable;
+
+    private IProcTable procTable;
 
     private IHeap heap;
 
@@ -40,7 +44,19 @@ public class PrgState {
     }
 
     public IDict<CloneableString, IValue> getSymTable() {
-        return symTable;
+        return symTableStack.top();
+    }
+
+    public IStack<IDict<CloneableString, IValue>> getSymTableStack() {
+        return symTableStack;
+    }
+
+    public void popSymTable() {
+        symTableStack.pop();
+    }
+
+    public void pushSymTable(IDict<CloneableString, IValue> symTable) {
+        symTableStack.push(symTable);
     }
 
     public IList<IValue> getOut() {
@@ -59,12 +75,12 @@ public class PrgState {
         return this.latchTable;
     }
 
-    public void setExeStack(AStack<IStmt> exeStack) {
-        this.exeStack = exeStack;
+    public IProcTable getProcTable() {
+        return this.procTable;
     }
 
-    public void setSymTable(ADict<CloneableString, IValue> symTable) {
-        this.symTable = symTable;
+    public void setExeStack(AStack<IStmt> exeStack) {
+        this.exeStack = exeStack;
     }
 
     public void setOut(AList<IValue> out) {
@@ -91,16 +107,22 @@ public class PrgState {
         return ++PrgState.nextId;
     }
 
-    public PrgState(IStack<IStmt> exeStack, IDict<CloneableString, IValue> symTable, IList<IValue> out,
-            IDict<CloneableString, CloneableBufferedReader> fbs, IHeap heap, ILatchTable latchTable, IStmt program) {
+    public void addProc(CloneableString name, ProcTableEntry entry) throws ExecutionException {
+        this.procTable.set(name, entry);
+    }
+
+    public PrgState(IStack<IStmt> exeStack, IStack<IDict<CloneableString, IValue>> symTableStack, IList<IValue> out,
+            IDict<CloneableString, CloneableBufferedReader> fbs, IHeap heap, ILatchTable latchTable,
+            IProcTable procTable, IStmt program) {
         this.id = PrgState.getNextId();
         this.exeStack = exeStack;
-        this.symTable = symTable;
+        this.symTableStack = symTableStack;
         this.out = out;
         this.originalProgram = program.deepCopy();
         this.fileTable = fbs;
         this.heap = heap;
         this.latchTable = latchTable;
+        this.procTable = procTable;
         exeStack.push(program);
     }
 
@@ -135,7 +157,7 @@ public class PrgState {
                 + "\nExeStack:\n"
                 + s.toString()
                 + "SymTable:\n"
-                + symTable.toString()
+                + symTableStack.toString()
                 + "\nOut:\n"
                 + out.toString()
                 + "File Table:\n"

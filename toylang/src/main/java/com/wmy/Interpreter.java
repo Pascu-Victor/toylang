@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.wmy.controller.IProgController;
@@ -35,7 +36,8 @@ public class Interpreter extends Application {
     private static Parent primaryScene;
     private static ListView<?> listView;
 
-    private static IProgController parseProgram(String source, String logFile) throws TypeException {
+    private static IProgController parseProgram(String source, List<String> procedures, String logFile)
+            throws TypeException {
         var lexer = new ProgLexer(source);
         var stmts = new AList<IStmt>();
         while (true) {
@@ -53,22 +55,47 @@ public class Interpreter extends Application {
 
         var typeEnv = new ADict<CloneableString, IType>();
 
+        var procTable = new ProcTable();
+        if (procedures == null) {
+            procedures = new ArrayList<>();
+        }
+        for (var proc : procedures) {
+            var lexerProc = new ProgLexer(proc);
+            var procedureInfo = lexerProc.parseProcedure();
+            if (procedureInfo == null) {
+                continue;
+            }
+            procTable.set(procedureInfo.getKey(), procedureInfo.getValue());
+        }
+
         comp.typecheck(typeEnv);
 
         var stk = new AStack<IStmt>();
+        var sts = new AStack<IDict<CloneableString, IValue>>();
         var st = new ADict<CloneableString, IValue>();
+        sts.push(st);
         var out = new AList<IValue>();
         var fbs = new ADict<CloneableString, CloneableBufferedReader>();
         var heap = new Heap();
         var latchTable = new LatchTable();
-        var prg = new PrgState(stk, st, out, fbs, heap, latchTable, comp);
+        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, comp);
         var repo = new StateRepo(prg, logFile);
         return new ProgController(repo);
     }
 
     private static Command command(String logName, String progKey, String progDesc, String src) {
         try {
-            var c = parseProgram(src, logName);
+            var c = parseProgram(src, null, logName);
+            return new RunExampleCommand(progKey, progDesc, c);
+        } catch (TypeException e) {
+            return new InvalidCommand(progKey, e.toString());
+        }
+    }
+
+    private static Command commandWithProcedures(String logName, String progKey, String progDesc, String src,
+            List<String> procedures) {
+        try {
+            var c = parseProgram(src, procedures, logName);
             return new RunExampleCommand(progKey, progDesc, c);
         } catch (TypeException e) {
             return new InvalidCommand(progKey, e.toString());
@@ -140,6 +167,15 @@ public class Interpreter extends Application {
 
         var sourceInvalidType = "int v; v=\"123\"";
 
+        var sourceProcedures1 = "call p(); call p();";
+        var sourceProcedureSum = "procedure sum(int a, int b){v=(a+b);print(v)}";
+        var sourceProcedureProduct = "procedure product(int a, int b){v=(a*b);print(v)}";
+        var sourceProcedures2 = "int v; v=2; int w; w=5" + //
+                "call sum((v*10),w); print(v)" + //
+                "fork({ call product(v,w); " + //
+                "       fork({ call sum(v,w) })" + //
+                "});";
+
         var programListUnchecked = scene.lookup("#programList");
 
         if (!(programListUnchecked instanceof ListView<?>)) {
@@ -190,6 +226,10 @@ public class Interpreter extends Application {
         commands.add(command("prgSwitchExp.log", "switchexp", "switch expression", sourceSwitchExp));
         commands.add(command("prgSwitchExpNodefault.log", "switchexpnodefault", "switch expression without default",
                 sourceSwitchExpNodefault));
+        commands.add(commandWithProcedures("prgProc.log", "proc", "procedure program", sourceProcedures1,
+                List.of("procedure p() { int v; v=2; print(v) }")));
+        commands.add(commandWithProcedures("prgProc2.log", "proc2", "procedure program 2", sourceProcedures2,
+                List.of(sourceProcedureSum, sourceProcedureProduct)));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 
