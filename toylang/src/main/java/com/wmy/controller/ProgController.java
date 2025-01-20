@@ -16,6 +16,7 @@ import com.wmy.models.adt.CloneableBufferedReader;
 import com.wmy.models.adt.CloneableString;
 import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
+import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
@@ -200,4 +201,9 @@ public class ProgController implements IProgController {
     public PrgState getSelectedProgramState() {
         return selectedPrgState;
     }
+
+    public ILatchTable getSelectedProgramStateLatchTable() {
+        return selectedPrgState.getLatchTable();
+    }
+
 }

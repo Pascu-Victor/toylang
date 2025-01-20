@@ -11,6 +11,7 @@ import com.wmy.models.adt.CloneableString;
 import com.wmy.models.adt.Heap;
 import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
+import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
@@ -24,6 +25,8 @@ public class PrgState {
     private IList<IValue> out;
 
     private IDict<CloneableString, CloneableBufferedReader> fileTable;
+
+    private ILatchTable latchTable;
 
     private IHeap heap;
 
@@ -50,6 +53,10 @@ public class PrgState {
 
     public IHeap getHeap() {
         return heap;
+    }
+
+    public ILatchTable getLatchTable() {
+        return this.latchTable;
     }
 
     public void setExeStack(AStack<IStmt> exeStack) {
@@ -85,7 +92,7 @@ public class PrgState {
     }
 
     public PrgState(IStack<IStmt> exeStack, IDict<CloneableString, IValue> symTable, IList<IValue> out,
-            IDict<CloneableString, CloneableBufferedReader> fbs, IHeap heap, IStmt program) {
+            IDict<CloneableString, CloneableBufferedReader> fbs, IHeap heap, ILatchTable latchTable, IStmt program) {
         this.id = PrgState.getNextId();
         this.exeStack = exeStack;
         this.symTable = symTable;
@@ -93,6 +100,7 @@ public class PrgState {
         this.originalProgram = program.deepCopy();
         this.fileTable = fbs;
         this.heap = heap;
+        this.latchTable = latchTable;
         exeStack.push(program);
     }
 
@@ -134,6 +142,8 @@ public class PrgState {
                 + fileTable.keys().toString()
                 + "Heap:\n"
                 + heap.toString()
+                + "Latch Table:\n"
+                + latchTable.toString()
                 + "\n";
     }
 }

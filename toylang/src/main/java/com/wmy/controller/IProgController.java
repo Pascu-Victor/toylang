@@ -8,6 +8,7 @@ import com.wmy.models.adt.CloneableBufferedReader;
 import com.wmy.models.adt.CloneableString;
 import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
+import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
@@ -39,5 +40,7 @@ public interface IProgController {
     public IList<IValue> getSelectedProgramStateOutput();
 
     public IDict<CloneableString, CloneableBufferedReader> getSelectedProgramStateFileTable();
+
+    public ILatchTable getSelectedProgramStateLatchTable();
 
 }

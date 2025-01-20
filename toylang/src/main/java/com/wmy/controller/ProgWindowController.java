@@ -50,6 +50,9 @@ public class ProgWindowController {
     public ListView<String> selectedProgramStateExeStack;
 
     @FXML
+    public TableView<Map.Entry<Integer, Integer>> latchTable;
+
+    @FXML
     public Button runOneStepButton;
 
     public void runOneStep() {
@@ -97,6 +100,9 @@ public class ProgWindowController {
                 FXCollections.observableArrayList(program.getSelectedProgramStateFileTable().entrySet().stream()
                         .map(e -> e.getKey().toString())
                         .toList()));
+        latchTable.setItems(
+                FXCollections
+                        .observableArrayList(program.getSelectedProgramStateLatchTable().entrySet().stream().toList()));
     }
 
     @FXML
@@ -129,6 +135,14 @@ public class ProgWindowController {
         TableColumn<Map.Entry<String, IValue>, IValue> symTableValueCol = new TableColumn<>("Value");
         symTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
         selectedProgramStateSymTable.getColumns().add(1, symTableValueCol);
+
+        TableColumn<Map.Entry<Integer, Integer>, Integer> latchTableIndexCol = new TableColumn<>("Index");
+        latchTableIndexCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
+        latchTable.getColumns().add(0, latchTableIndexCol);
+
+        TableColumn<Map.Entry<Integer, Integer>, Integer> latchTableValueCol = new TableColumn<>("Value");
+        latchTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
+        latchTable.getColumns().add(1, latchTableValueCol);
 
         this.program.getProgramStateList().addListener((ListChangeListener<PrgState>) (_) -> {
             programStateList.setItems(program.getProgramStateList());

@@ -60,7 +60,8 @@ public class Interpreter extends Application {
         var out = new AList<IValue>();
         var fbs = new ADict<CloneableString, CloneableBufferedReader>();
         var heap = new Heap();
-        var prg = new PrgState(stk, st, out, fbs, heap, comp);
+        var latchTable = new LatchTable();
+        var prg = new PrgState(stk, st, out, fbs, heap, latchTable, comp);
         var repo = new StateRepo(prg, logFile);
         return new ProgController(repo);
     }
@@ -109,6 +110,28 @@ public class Interpreter extends Application {
         var sourceSwitchExp = "int v; v=10; switch(v) { case(1) { print(1) } case(2) { print(2) } default { print(3) } }";
         var sourceSwitchExpNodefault = "int v; v=10; switch(v) { case(1) { print(1) } case(3) { print(3) } }";
 
+        var sourceCountdownLatch = "Ref int v1; Ref int v2; Ref int v3; int cnt;\n" +
+                "new(v1,2);new(v2,3);new(v3,4);newLatch(cnt,rH(v2));\n" +
+                "fork({\n" +
+                "    wH(v1,(rH(v1)*10));\n" +
+                "    print(rH(v1));\n" +
+                "    countDown(cnt);\n" +
+                "    fork({\n" +
+                "        wH(v2,(rH(v2)*10));\n" +
+                "        print(rH(v2));\n" +
+                "        countDown(cnt);\n" +
+                "        fork({\n" +
+                "            wH(v3,(rH(v3)*10));\n" +
+                "            print(rH(v3));\n" +
+                "            countDown(cnt)\n" +
+                "        })\n" +
+                "    })\n" +
+                "});\n" +
+                "await(cnt);\n" +
+                "print(100);\n" +
+                "countDown(cnt);\n" +
+                "print(100)";
+
         var sourceInvalidType = "int v; v=\"123\"";
 
         var programListUnchecked = scene.lookup("#programList");
@@ -156,6 +179,7 @@ public class Interpreter extends Application {
         commands.add(command("prgForkFork.log", "forkfork", "fork with a fork in it", sourceForkFork));
         commands.add(command("prgForkConsec.log", "forkconsec", "two consecutive forks", sourceForkConsec));
         commands.add(command("prgInvalid.log", "invalid", "invalid program", sourceInvalidType));
+        commands.add(command("prgCountdownLatch.log", "countdown", "Countdown latch program", sourceCountdownLatch));
         commands.add(command("prgSwitchExp.log", "switchexp", "switch expression", sourceSwitchExp));
         commands.add(command("prgSwitchExpNodefault.log", "switchexpnodefault", "switch expression without default",
                 sourceSwitchExpNodefault));

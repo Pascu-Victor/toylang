@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.wmy.models.adt.AList;
+import com.wmy.models.adt.CloneableString;
 import com.wmy.models.expressions.*;
 import com.wmy.models.statements.*;
 import com.wmy.models.types.*;
@@ -222,6 +223,12 @@ public class ProgLexer {
                 return forkStmt();
             case "switch":
                 return switchStmt();
+            case "newLatch":
+                return newLatchStmt();
+            case "countDown":
+                return countDownStmt();
+            case "await":
+                return awaitStmt();
             default:
                 return assignStmt();
         }
@@ -278,6 +285,43 @@ public class ProgLexer {
         IExp fileName = expression();
         consume(')');
         return new OpenRFileStmt(fileName);
+    }
+
+    private NewLatchStmt newLatchStmt() {
+        consumeKeyword("newLatch");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(',');
+        skipWhitespace();
+        IExp exp = expression();
+        skipWhitespace();
+        consume(')');
+        return new NewLatchStmt(varName, exp);
+    }
+
+    private CountDownStmt countDownStmt() {
+        consumeKeyword("countDown");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new CountDownStmt(varName);
+    }
+
+    private AwaitStmt awaitStmt() {
+        consumeKeyword("await");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new AwaitStmt(varName);
     }
 
     private CloseRFileStmt closeRFileStmt() {
