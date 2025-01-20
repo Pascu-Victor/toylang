@@ -38,4 +38,11 @@ public class AStack<T extends ICloneable> implements IStack<T> {
     public boolean isEmpty() {
         return stack.isEmpty();
     }
+
+    @Override
+    public String toString() {
+        return stack.stream()
+                .map(Object::toString)
+                .reduce("", (acc, s) -> acc + "[" + s + "]\n");
+    }
 }
