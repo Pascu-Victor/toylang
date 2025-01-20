@@ -3,7 +3,7 @@ package com.wmy.models.adt;
 import java.util.Stack;
 import java.util.stream.Stream;
 
-public class AStack<T> implements IStack<T> {
+public class AStack<T extends ICloneable> implements IStack<T> {
     private Stack<T> stack;
 
     public AStack() {
@@ -22,9 +22,12 @@ public class AStack<T> implements IStack<T> {
         return stack.peek();
     }
 
+    @SuppressWarnings("unchecked")
     public IStack<T> deepCopy() {
         var copy = new AStack<T>();
-        stack.forEach(copy::push);
+        stack.stream()
+                .map(t -> (T) t.deepCopy())
+                .forEach(copy::push);
         return copy;
     }
 
