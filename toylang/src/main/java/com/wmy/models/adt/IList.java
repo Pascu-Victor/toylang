@@ -2,7 +2,7 @@ package com.wmy.models.adt;
 
 import java.util.stream.Stream;
 
-public interface IList<T> extends Iterable<T> {
+public interface IList<T extends ICloneable> extends Iterable<T>, ICloneable {
     void add(T elem);
 
     void remove(T elem);
@@ -16,4 +16,6 @@ public interface IList<T> extends Iterable<T> {
     String toString();
 
     Stream<T> stream();
+
+    IList<T> deepCopy();
 }

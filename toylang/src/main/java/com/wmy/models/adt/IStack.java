@@ -2,7 +2,7 @@ package com.wmy.models.adt;
 
 import java.util.stream.Stream;
 
-public interface IStack<T> {
+public interface IStack<T extends ICloneable> extends ICloneable {
     void push(T elem);
 
     T pop();

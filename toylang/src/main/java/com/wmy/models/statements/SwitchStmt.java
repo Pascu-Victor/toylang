@@ -1,8 +1,6 @@
 package com.wmy.models.statements;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.wmy.models.adt.Entry;
 import com.wmy.exceptions.ExecutionException;
 import com.wmy.exceptions.TypeException;
 import com.wmy.models.PrgState;
@@ -61,9 +59,7 @@ public class SwitchStmt implements IStmt {
     @Override
     public IStmt deepCopy() {
         var newCases = new AList<Entry<IExp, IStmt>>();
-        this.cases.forEach(c -> newCases.add(
-                Map.entry(c.getKey().deepCopy(),
-                        c.getValue().deepCopy())));
+        this.cases.forEach(c -> newCases.add(c.deepCopy()));
         IStmt defaultCase = null;
         if (this.defaultCase != null) {
             defaultCase = this.defaultCase.deepCopy();

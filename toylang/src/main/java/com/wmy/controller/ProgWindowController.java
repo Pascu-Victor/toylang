@@ -1,8 +1,6 @@
 package com.wmy.controller;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.wmy.models.adt.Entry;
 import com.wmy.exceptions.ExecutionException;
 import com.wmy.models.PrgState;
 import com.wmy.models.values.IValue;
@@ -44,7 +42,7 @@ public class ProgWindowController {
     public ListView<PrgState> programStateList;
 
     @FXML
-    public TableView<Map.Entry<String, IValue>> selectedProgramStateSymTable;
+    public TableView<Entry<String, IValue>> selectedProgramStateSymTable;
 
     @FXML
     public ListView<String> selectedProgramStateExeStack;
@@ -87,11 +85,11 @@ public class ProgWindowController {
                         .map(Object::toString).toList()));
         selectedProgramStateSymTable.setItems(FXCollections
                 .observableArrayList(program.getSelectedProgramStateSymTable().entrySet().stream()
-                        .map(e -> Map.entry(e.getKey().toString(), e.getValue()))
+                        .map(e -> new Entry<String, IValue>(e.getKey().toString(), e.getValue()))
                         .toList()));
         heapTable.setItems(FXCollections
                 .observableArrayList(program.getSelectedProgramStateHeapTable().entrySet().stream()
-                        .map(e -> Map.entry(e.getKey(), e.getValue().getVal()))
+                        .map(e -> new Entry<Integer, IValue>(e.getKey(), e.getValue().getVal()))
                         .toList()));
         outputList.setItems(FXCollections
                 .observableArrayList(program.getSelectedProgramStateOutput().stream()
@@ -120,19 +118,19 @@ public class ProgWindowController {
             }
         });
 
-        TableColumn<Map.Entry<Integer, IValue>, Integer> heapAddressCol = new TableColumn<>("Address");
+        TableColumn<Entry<Integer, IValue>, Integer> heapAddressCol = new TableColumn<>("Address");
         heapAddressCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
         heapTable.getColumns().add(0, heapAddressCol);
 
-        TableColumn<Map.Entry<Integer, IValue>, IValue> heapValueCol = new TableColumn<>("Value");
+        TableColumn<Entry<Integer, IValue>, IValue> heapValueCol = new TableColumn<>("Value");
         heapValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
         heapTable.getColumns().add(1, heapValueCol);
 
-        TableColumn<Map.Entry<String, IValue>, String> symTableVarNameCol = new TableColumn<>("Variable");
+        TableColumn<Entry<String, IValue>, String> symTableVarNameCol = new TableColumn<>("Variable");
         symTableVarNameCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
         selectedProgramStateSymTable.getColumns().add(0, symTableVarNameCol);
 
-        TableColumn<Map.Entry<String, IValue>, IValue> symTableValueCol = new TableColumn<>("Value");
+        TableColumn<Entry<String, IValue>, IValue> symTableValueCol = new TableColumn<>("Value");
         symTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
         selectedProgramStateSymTable.getColumns().add(1, symTableValueCol);
 

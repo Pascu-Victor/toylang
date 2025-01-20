@@ -11,14 +11,13 @@ import java.util.Set;
 
 import com.wmy.exceptions.ExecutionException;
 
-
 public class Heap implements IHeap {
-    
+
     private Map<Integer, HeapEntry> vals;
 
     private int addr = 1;
 
-    public IValue at(int addr) throws ExecutionException{
+    public IValue at(int addr) throws ExecutionException {
         try {
             return vals.get(addr).getVal();
         } catch (Exception e) {
@@ -78,7 +77,18 @@ public class Heap implements IHeap {
     @Override
     public String toString() {
         return vals.entrySet().stream()
-            .map(e -> e.getKey() + "->" + e.getValue())
-            .collect(Collectors.joining("\n"));
+                .map(e -> e.getKey() + "->" + e.getValue())
+                .collect(Collectors.joining("\n"));
+    }
+
+    @Override
+    public Object deepCopy() {
+        var copy = new HashMap<Integer, HeapEntry>();
+        vals.entrySet()
+                .stream()
+                .forEach(e -> copy.put(e.getKey(), e.getValue().deepCopy()));
+        var newHeap = new Heap();
+        newHeap.setContent(copy);
+        return newHeap;
     }
 }

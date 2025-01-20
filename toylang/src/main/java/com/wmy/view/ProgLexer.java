@@ -2,9 +2,8 @@ package com.wmy.view;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import com.wmy.models.adt.Entry;
 import com.wmy.models.adt.AList;
 import com.wmy.models.adt.CloneableString;
 import com.wmy.models.expressions.*;

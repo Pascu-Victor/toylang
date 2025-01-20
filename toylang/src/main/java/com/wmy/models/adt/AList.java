@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AList<T> implements IList<T> {
+public class AList<T extends ICloneable> implements IList<T> {
     private ArrayList<T> list;
 
     public AList() {
@@ -62,5 +62,15 @@ public class AList<T> implements IList<T> {
     @Override
     public boolean equals(Object obj) {
         return list.equals(obj);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AList<T> deepCopy() {
+        var copy = new AList<T>();
+        list.stream()
+                .map(t -> (T) t.deepCopy())
+                .forEach(copy::add);
+        return copy;
     }
 }
