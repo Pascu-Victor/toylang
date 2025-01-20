@@ -176,6 +176,9 @@ public class Interpreter extends Application {
                 "       fork({ call sum(v,w) })" + //
                 "});";
 
+        var sourceSleep = "int v; v=10;\n" + //
+                "fork({v=(v-1);v=(v-1);print(v)}) sleep(10);print((v*10))";
+
         var programListUnchecked = scene.lookup("#programList");
 
         if (!(programListUnchecked instanceof ListView<?>)) {
@@ -230,6 +233,7 @@ public class Interpreter extends Application {
                 List.of("procedure p() { int v; v=2; print(v) }")));
         commands.add(commandWithProcedures("prgProc2.log", "proc2", "procedure program 2", sourceProcedures2,
                 List.of(sourceProcedureSum, sourceProcedureProduct)));
+        commands.add(command("prgSleep.log", "sleep", "sleep program", sourceSleep));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 

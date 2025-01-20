@@ -233,9 +233,22 @@ public class ProgLexer {
                 return repeatUntilStmt();
             case "call":
                 return callStmt();
+            case "sleep":
+                return sleepStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private SleepStmt sleepStmt() {
+        consumeKeyword("sleep");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        int time = Integer.parseInt(integer());
+        skipWhitespace();
+        consume(')');
+        return new SleepStmt(time);
     }
 
     private CallStmt callStmt() {
