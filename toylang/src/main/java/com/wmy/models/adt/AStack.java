@@ -18,6 +18,16 @@ public class AStack<T> implements IStack<T> {
         return stack.pop();
     }
 
+    public T top() {
+        return stack.peek();
+    }
+
+    public IStack<T> deepCopy() {
+        var copy = new AStack<T>();
+        stack.forEach(copy::push);
+        return copy;
+    }
+
     public Stream<T> stream() {
         return stack.stream();
     }
