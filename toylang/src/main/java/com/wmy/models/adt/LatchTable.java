@@ -2,7 +2,6 @@ package com.wmy.models.adt;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import com.wmy.exceptions.ExecutionException;
 
@@ -37,7 +36,9 @@ public class LatchTable implements ILatchTable {
 
     @Override
     public Set<Entry<Integer, Integer>> entrySet() {
-        return vals.entrySet();
+        return vals.entrySet().stream()
+                .map(e -> new Entry<Integer, Integer>(e.getKey(), e.getValue()))
+                .collect(java.util.stream.Collectors.toSet());
     }
 
     @Override
@@ -76,5 +77,12 @@ public class LatchTable implements ILatchTable {
 
     public LatchTable(Map<Integer, Integer> data) {
         this.vals = data;
+    }
+
+    @Override
+    public ILatchTable deepCopy() {
+        var newVals = new java.util.HashMap<Integer, Integer>();
+        vals.forEach((k, v) -> newVals.put(k, v));
+        return new LatchTable(newVals);
     }
 }

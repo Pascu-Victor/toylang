@@ -2,11 +2,10 @@ package com.wmy.models.adt;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import com.wmy.exceptions.ExecutionException;
 
-public interface ILatchTable {
+public interface ILatchTable extends ICloneable {
     Integer at(Integer key) throws ExecutionException;
 
     void set(Integer key, Integer value) throws ExecutionException;
@@ -20,4 +19,6 @@ public interface ILatchTable {
     public boolean contains(Integer key);
 
     Set<Entry<Integer, Integer>> entrySet();
+
+    ILatchTable deepCopy();
 }
