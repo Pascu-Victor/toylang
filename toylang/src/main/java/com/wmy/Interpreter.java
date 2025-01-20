@@ -132,6 +132,12 @@ public class Interpreter extends Application {
                 "countDown(cnt);\n" +
                 "print(100)";
 
+        var sourceRepeatUntil = "int x; int y; int z; int w; int v;" + //
+                "v=0;\n" + //
+                "repeat { fork({ print(v); v=(v-1) }); v=(v+1) } until ((v==3));\n" + //
+                "x=1;y=2;z=3;w=4;\n" + //
+                "print((v*10))";
+
         var sourceInvalidType = "int v; v=\"123\"";
 
         var programListUnchecked = scene.lookup("#programList");
@@ -179,6 +185,7 @@ public class Interpreter extends Application {
         commands.add(command("prgForkFork.log", "forkfork", "fork with a fork in it", sourceForkFork));
         commands.add(command("prgForkConsec.log", "forkconsec", "two consecutive forks", sourceForkConsec));
         commands.add(command("prgInvalid.log", "invalid", "invalid program", sourceInvalidType));
+        commands.add(command("prgRepeatUntil.log", "repeatUntil", "repeat until expression", sourceRepeatUntil));
         commands.add(command("prgCountdownLatch.log", "countdown", "Countdown latch program", sourceCountdownLatch));
         commands.add(command("prgSwitchExp.log", "switchexp", "switch expression", sourceSwitchExp));
         commands.add(command("prgSwitchExpNodefault.log", "switchexpnodefault", "switch expression without default",

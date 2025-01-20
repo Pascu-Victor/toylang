@@ -229,9 +229,27 @@ public class ProgLexer {
                 return countDownStmt();
             case "await":
                 return awaitStmt();
+            case "repeat":
+                return repeatUntilStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private RepeatUntilStmt repeatUntilStmt() {
+        consumeKeyword("repeat");
+        skipWhitespace();
+        IStmt stmts = consumeCodeBlock();
+        skipWhitespace();
+        consumeKeyword("until");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        IExp exp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        return new RepeatUntilStmt(exp, stmts);
     }
 
     private NopStmt nopStmt() {
