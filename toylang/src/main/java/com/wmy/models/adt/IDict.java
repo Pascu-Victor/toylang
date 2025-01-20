@@ -1,7 +1,6 @@
 package com.wmy.models.adt;
 
 import java.util.Collection;
-import java.util.Map.Entry;
 
 public interface IDict<TKey extends ICloneable, TVal extends ICloneable> extends ICloneable {
     void set(TKey key, TVal value);

@@ -5,7 +5,6 @@ import com.wmy.models.values.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.Set;
 
@@ -59,7 +58,7 @@ public class Heap implements IHeap {
     }
 
     public Set<Entry<Integer, HeapEntry>> entrySet() {
-        return vals.entrySet();
+        return vals.entrySet().stream().map(e -> new Entry<>(e.getKey(), e.getValue())).collect(Collectors.toSet());
     }
 
     public void setContent(Map<Integer, HeapEntry> content) {

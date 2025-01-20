@@ -3,7 +3,6 @@ package com.wmy.models.adt;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class ADict<TKey extends ICloneable, TVal extends ICloneable> implements IDict<TKey, TVal> {
@@ -62,7 +61,7 @@ public class ADict<TKey extends ICloneable, TVal extends ICloneable> implements 
     }
 
     public Collection<Entry<TKey, TVal>> entrySet() {
-        return dict.entrySet();
+        return dict.entrySet().stream().map(e -> new Entry<>(e.getKey(), e.getValue())).collect(Collectors.toSet());
     }
 
 }
