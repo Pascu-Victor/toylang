@@ -456,7 +456,7 @@ public class ProgLexer {
                 skipWhitespace();
                 IStmt caseStmt = consumeCodeBlock();
                 skipWhitespace();
-                cases.add(Map.entry(caseExp, caseStmt));
+                cases.add(new Entry<IExp, IStmt>(caseExp, caseStmt));
             } else {
                 consumeKeyword("default");
                 skipWhitespace();
