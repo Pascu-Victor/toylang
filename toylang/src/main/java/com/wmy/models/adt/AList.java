@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AList<T extends ICloneable> implements IList<T> {
+public class AList<T> implements IList<T> {
     private ArrayList<T> list;
 
     public AList() {
@@ -69,7 +69,12 @@ public class AList<T extends ICloneable> implements IList<T> {
     public AList<T> deepCopy() {
         var copy = new AList<T>();
         list.stream()
-                .map(t -> (T) t.deepCopy())
+                .map(t -> {
+                    if (t instanceof ICloneable) {
+                        return (T) ((ICloneable) t).deepCopy();
+                    }
+                    return t;
+                })
                 .forEach(copy::add);
         return copy;
     }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ADict<TKey extends ICloneable, TVal extends ICloneable> implements IDict<TKey, TVal> {
+public class ADict<TKey, TVal> implements IDict<TKey, TVal> {
     private Map<TKey, TVal> dict;
 
     public void set(TKey key, TVal value) {
@@ -41,7 +41,21 @@ public class ADict<TKey extends ICloneable, TVal extends ICloneable> implements 
     public IDict<TKey, TVal> deepCopy() {
         var hm = new HashMap<TKey, TVal>();
         for (var i : dict.entrySet()) {
-            hm.put((TKey) i.getKey().deepCopy(), (TVal) i.getValue().deepCopy());
+            TKey key;
+            TVal value;
+            if (i.getKey() instanceof ICloneable) {
+                key = (TKey) ((ICloneable) i.getKey()).deepCopy();
+            } else {
+                key = i.getKey();
+            }
+
+            if (i.getValue() instanceof ICloneable) {
+                value = (TVal) ((ICloneable) i.getValue()).deepCopy();
+            } else {
+                value = i.getValue();
+            }
+
+            hm.put(key, value);
         }
         return new ADict<>(hm);
     }

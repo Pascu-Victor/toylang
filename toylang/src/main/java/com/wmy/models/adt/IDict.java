@@ -2,7 +2,7 @@ package com.wmy.models.adt;
 
 import java.util.Collection;
 
-public interface IDict<TKey extends ICloneable, TVal extends ICloneable> extends ICloneable {
+public interface IDict<TKey, TVal> extends ICloneable {
     void set(TKey key, TVal value);
 
     TVal get(TKey key);
