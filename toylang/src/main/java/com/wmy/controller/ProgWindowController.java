@@ -2,6 +2,7 @@ package com.wmy.controller;
 
 import com.wmy.models.adt.Entry;
 import com.wmy.models.adt.IList;
+import com.wmy.models.adt.IBarrierTable.BarrierTableEntry;
 import com.wmy.models.adt.IProcTable.ProcTableEntry;
 
 import com.wmy.exceptions.ExecutionException;
@@ -61,6 +62,9 @@ public class ProgWindowController {
 
     @FXML
     public TableView<Entry<Integer, Integer>> lockTable;
+
+    @FXML
+    public TableView<Entry<Integer, BarrierTableEntry>> barrierTable;
 
     @FXML
     public Button runOneStepButton;
@@ -124,6 +128,10 @@ public class ProgWindowController {
         lockTable.setItems(
                 FXCollections
                         .observableArrayList(program.getSelectedProgramStateLockTable().entrySet().stream().toList()));
+        barrierTable.setItems(
+                FXCollections.observableArrayList(program.getSelectedProgramStateBarrierTable().entrySet().stream()
+                        .map(e -> new Entry<Integer, BarrierTableEntry>(e.getKey(), e.getValue()))
+                        .toList()));
 
     }
 
@@ -186,6 +194,20 @@ public class ProgWindowController {
                 p.getValue().getValue().getValue().stream().map(e -> e.toString())
                         .reduce((a, b) -> a + ", " + b.toString()).orElse("")));
         semaphoreTable.getColumns().add(2, semaphoreTableListCol);
+
+        TableColumn<Entry<Integer, BarrierTableEntry>, Integer> barrierTableIndexCol = new TableColumn<>("Barrier Id");
+        barrierTableIndexCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
+        barrierTable.getColumns().add(0, barrierTableIndexCol);
+
+        TableColumn<Entry<Integer, BarrierTableEntry>, Integer> barrierTableValueCol = new TableColumn<>(
+                "Barrier Value");
+        barrierTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue().getCount()));
+        barrierTable.getColumns().add(1, barrierTableValueCol);
+
+        TableColumn<Entry<Integer, BarrierTableEntry>, String> barrierTableListCol = new TableColumn<>("Wait List");
+        barrierTableListCol.setCellValueFactory(p -> new SimpleObjectProperty<>(
+                p.getValue().getValue().getWaitList().stream().map(e -> e.toString())
+                        .reduce((a, b) -> a + ", " + b.toString()).orElse("")));
 
         TableColumn<Entry<String, ProcTableEntry>, String> procTableProcCodeCol = new TableColumn<>("Code");
         procTableProcCodeCol.setCellValueFactory(p -> {

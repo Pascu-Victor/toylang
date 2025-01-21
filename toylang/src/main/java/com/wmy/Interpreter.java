@@ -80,7 +80,9 @@ public class Interpreter extends Application {
         var latchTable = new LatchTable();
         var semaphoreTable = new SemaphoreTable();
         var lockTable = new LockTable();
-        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, semaphoreTable, lockTable, comp);
+        var barrierTable = new BarrierTable();
+        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, semaphoreTable, lockTable, barrierTable,
+                comp);
         var repo = new StateRepo(prg, logFile);
         return new ProgController(repo);
     }
@@ -215,6 +217,22 @@ public class Interpreter extends Application {
                 "lock(x); print(rH(v1)); unlock(x);\n" + //
                 "lock(q); print(rH(v2)); unlock(q);";
 
+        var sourceBarrier = "Ref int v1; Ref int v2; Ref int v3; int cnt;\n" + //
+                "new(v1,2);new(v2,3);new(v3,4);newBarrier(cnt,rH(v2));\n" + //
+                "fork({\n" + //
+                "    barrierAwait(cnt);\n" + //
+                "    wH(v1,(rH(v1)*10));\n" + //
+                "    print(rH(v1))\n" + //
+                "});\n" + //
+                "fork({\n" + //
+                "    barrierAwait(cnt);\n" + //
+                "    wH(v2,(rH(v2)*10));\n" + //
+                "    wH(v2,(rH(v2)*10));\n" + //
+                "    print(rH(v2))\n" + //
+                "});\n" + //
+                "barrierAwait(cnt);\n" + //
+                "print(rH(v3));";
+
         var programListUnchecked = scene.lookup("#programList");
 
         if (!(programListUnchecked instanceof ListView<?>)) {
@@ -274,6 +292,7 @@ public class Interpreter extends Application {
         commands.add(command("prgSemaphore.log", "semaphore", "semaphore program", sourceSemaphore));
         commands.add(command("prgForStmt.log", "forstmt", "for statement program", sourceForStmt));
         commands.add(command("prgLock.log", "lock", "lock program", sourceLock));
+        commands.add(command("prgBarrier.log", "barrier", "barrier program", sourceBarrier));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 

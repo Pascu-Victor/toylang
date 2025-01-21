@@ -268,9 +268,39 @@ public class ProgLexer {
                 return lockStmt();
             case "unlock":
                 return unlockStmt();
+            case "barrierAwait":
+                return barrierAwaitStmt();
+            case "newBarrier":
+                return newBarrierStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private BarrierAwaitStmt barrierAwaitStmt() {
+        consumeKeyword("barrierAwait");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new BarrierAwaitStmt(varName);
+    }
+
+    private NewBarrierStmt newBarrierStmt() {
+        consumeKeyword("newBarrier");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(',');
+        skipWhitespace();
+        IExp exp = expression();
+        skipWhitespace();
+        consume(')');
+        return new NewBarrierStmt(varName, exp);
     }
 
     private UnlockStmt unlockStmt() {

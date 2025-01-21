@@ -9,6 +9,7 @@ import com.wmy.models.adt.AStack;
 import com.wmy.models.adt.CloneableBufferedReader;
 import com.wmy.models.adt.CloneableString;
 import com.wmy.models.adt.Heap;
+import com.wmy.models.adt.IBarrierTable;
 import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
@@ -39,6 +40,8 @@ public class PrgState {
     private ISemaphoreTable semaphoreTable;
 
     private ILockTable lockTable;
+
+    private IBarrierTable barrierTable;
 
     private int id;
     private static int nextId = 0;
@@ -89,6 +92,10 @@ public class PrgState {
         return this.lockTable;
     }
 
+    public IBarrierTable getBarrierTable() {
+        return this.barrierTable;
+    }
+
     public void setExeStack(AStack<IStmt> exeStack) {
         this.exeStack = exeStack;
     }
@@ -127,7 +134,8 @@ public class PrgState {
 
     public PrgState(IStack<IStmt> exeStack, IStack<IDict<CloneableString, IValue>> symTableStack, IList<IValue> out,
             IDict<CloneableString, CloneableBufferedReader> fbs, IHeap heap, ILatchTable latchTable,
-            IProcTable procTable, ISemaphoreTable semaphoreTable, ILockTable lockTable, IStmt program) {
+            IProcTable procTable, ISemaphoreTable semaphoreTable, ILockTable lockTable, IBarrierTable barrierTable,
+            IStmt program) {
         this.id = PrgState.getNextId();
         this.exeStack = exeStack;
         this.symTableStack = symTableStack;
@@ -139,6 +147,7 @@ public class PrgState {
         this.procTable = procTable;
         this.semaphoreTable = semaphoreTable;
         this.lockTable = lockTable;
+        this.barrierTable = barrierTable;
         exeStack.push(program);
     }
 
@@ -188,6 +197,8 @@ public class PrgState {
                 + semaphoreTable.toString()
                 + "\nLock Table:\n"
                 + lockTable.toString()
+                + "\nBarrier Table:\n"
+                + barrierTable.toString()
                 + "\n";
     }
 }

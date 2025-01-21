@@ -14,6 +14,10 @@ public class ProcTable implements IProcTable {
         content = new HashMap<>();
     }
 
+    public ProcTable(Map<CloneableString, ProcTableEntry> content) {
+        this.content = content;
+    }
+
     @Override
     public ProcTableEntry at(CloneableString key) throws ExecutionException {
         if (!content.containsKey(key)) {
@@ -51,5 +55,12 @@ public class ProcTable implements IProcTable {
     public String toString() {
         return content.entrySet().stream().map(e -> "procedure " + e.getKey() + " " + e.getValue())
                 .collect(Collectors.joining("\n"));
+    }
+
+    @Override
+    public Object deepCopy() {
+        Map<CloneableString, ProcTableEntry> newContent = new HashMap<>();
+        content.forEach((k, v) -> newContent.put(k.deepCopy(), v.deepCopy()));
+        return new ProcTable(newContent);
     }
 }

@@ -6,6 +6,7 @@ import com.wmy.exceptions.ExecutionException;
 import com.wmy.models.PrgState;
 import com.wmy.models.adt.CloneableBufferedReader;
 import com.wmy.models.adt.CloneableString;
+import com.wmy.models.adt.IBarrierTable;
 import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
@@ -51,4 +52,6 @@ public interface IProgController {
     public ISemaphoreTable getSelectedProgramStateSemaphoreTable();
 
     public ILockTable getSelectedProgramStateLockTable();
+
+    public IBarrierTable getSelectedProgramStateBarrierTable();
 }

@@ -7,7 +7,7 @@ import com.wmy.exceptions.ExecutionException;
 import com.wmy.models.statements.IStmt;
 import com.wmy.models.types.IType;
 
-public interface IProcTable {
+public interface IProcTable extends ICloneable {
     public class ProcTableEntry implements ICloneable {
         private IList<Entry<CloneableString, IType>> params;
         private IStmt procedure;
