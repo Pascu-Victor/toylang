@@ -18,6 +18,7 @@ import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
+import com.wmy.models.adt.ILockTable;
 import com.wmy.models.adt.IProcTable;
 import com.wmy.models.adt.ISemaphoreTable;
 import com.wmy.models.adt.IStack;
@@ -215,4 +216,9 @@ public class ProgController implements IProgController {
     public ISemaphoreTable getSelectedProgramStateSemaphoreTable() {
         return selectedPrgState.getSemaphoreTable();
     }
+
+    public ILockTable getSelectedProgramStateLockTable() {
+        return selectedPrgState.getLockTable();
+    }
+
 }

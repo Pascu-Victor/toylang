@@ -79,7 +79,8 @@ public class Interpreter extends Application {
         var heap = new Heap();
         var latchTable = new LatchTable();
         var semaphoreTable = new SemaphoreTable();
-        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, semaphoreTable, comp);
+        var lockTable = new LockTable();
+        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, semaphoreTable, lockTable, comp);
         var repo = new StateRepo(prg, logFile);
         return new ProgController(repo);
     }
@@ -198,6 +199,22 @@ public class Interpreter extends Application {
                 + " v = ((1+1) <= 2) ? 1 : 2; print(v);"
                 + " Ref int i; new(i, 2); v = (rH(i) == 4) ? 1 : 2; print(v);";
 
+        var sourceLock = "Ref int v1; Ref int v2; int x;  int q;      \n" + //
+                "new(v1,20);new(v2,30);newLock(x);\n" + //
+                "fork({\n" + //
+                "   fork({\n" + //
+                "     lock(x);wH(v1,(rH(v1)-1));unlock(x)\n" + //
+                "   }); \n" + //
+                "   lock(x);wH(v1,(rH(v1)*10));unlock(x)\n" + //
+                "});newLock(q);\n" + //
+                "fork({\n" + //
+                "   fork({lock(q);wH(v2,(rH(v2)+5));unlock(q)});\n" + //
+                "  lock(q);wH(v2,(rH(v2)*10));unlock(q)\n" + //
+                "});\n" + //
+                "nop;nop;nop;nop;\n" + //
+                "lock(x); print(rH(v1)); unlock(x);\n" + //
+                "lock(q); print(rH(v2)); unlock(q);";
+
         var programListUnchecked = scene.lookup("#programList");
 
         if (!(programListUnchecked instanceof ListView<?>)) {
@@ -256,6 +273,7 @@ public class Interpreter extends Application {
         commands.add(command("prgCondExp.log", "condexp", "conditional expression program", sourceCondExp));
         commands.add(command("prgSemaphore.log", "semaphore", "semaphore program", sourceSemaphore));
         commands.add(command("prgForStmt.log", "forstmt", "for statement program", sourceForStmt));
+        commands.add(command("prgLock.log", "lock", "lock program", sourceLock));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 

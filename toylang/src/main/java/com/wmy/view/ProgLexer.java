@@ -262,9 +262,48 @@ public class ProgLexer {
                 return semAcquireStmt();
             case "for":
                 return forStmt();
+            case "newLock":
+                return newLockStmt();
+            case "lock":
+                return lockStmt();
+            case "unlock":
+                return unlockStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private UnlockStmt unlockStmt() {
+        consumeKeyword("unlock");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new UnlockStmt(varName);
+    }
+
+    private LockStmt lockStmt() {
+        consumeKeyword("lock");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new LockStmt(varName);
+    }
+
+    private NewLockStmt newLockStmt() {
+        consumeKeyword("newLock");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new NewLockStmt(varName);
     }
 
     private ForStmt forStmt() {

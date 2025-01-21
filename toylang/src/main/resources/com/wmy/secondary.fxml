@@ -34,6 +34,8 @@
                 <TableView fx:id="procedureTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                 <Label text="Semaphore Table" />
                 <TableView fx:id="semaphoreTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                <Label text="Lock Table" />
+                <TableView fx:id="lockTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
             </VBox>
         </HBox>
         <HBox>

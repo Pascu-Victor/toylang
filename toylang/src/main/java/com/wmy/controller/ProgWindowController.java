@@ -60,6 +60,9 @@ public class ProgWindowController {
     public TableView<Entry<Integer, Entry<Integer, IList<Integer>>>> semaphoreTable;
 
     @FXML
+    public TableView<Entry<Integer, Integer>> lockTable;
+
+    @FXML
     public Button runOneStepButton;
 
     public void runOneStep() {
@@ -118,6 +121,10 @@ public class ProgWindowController {
                 FXCollections.observableArrayList(program.getSelectedProgramStateSemaphoreTable().entrySet().stream()
                         .map(e -> new Entry<Integer, Entry<Integer, IList<Integer>>>(e.getKey(), e.getValue()))
                         .toList()));
+        lockTable.setItems(
+                FXCollections
+                        .observableArrayList(program.getSelectedProgramStateLockTable().entrySet().stream().toList()));
+
     }
 
     @FXML
@@ -193,6 +200,14 @@ public class ProgWindowController {
             return new SimpleObjectProperty<>(procString);
         });
         procedureTable.getColumns().add(1, procTableProcCodeCol);
+
+        TableColumn<Entry<Integer, Integer>, Integer> lockTableIndexCol = new TableColumn<>("Lock Id");
+        lockTableIndexCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
+        lockTable.getColumns().add(0, lockTableIndexCol);
+
+        TableColumn<Entry<Integer, Integer>, Integer> lockTableValueCol = new TableColumn<>("Lock State");
+        lockTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
+        lockTable.getColumns().add(1, lockTableValueCol);
 
         this.program.getProgramStateList().addListener((ListChangeListener<PrgState>) (_) -> {
             programStateList.setItems(program.getProgramStateList());

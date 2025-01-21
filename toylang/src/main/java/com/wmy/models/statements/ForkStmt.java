@@ -18,7 +18,8 @@ public class ForkStmt implements IStmt {
                 state.getHeap(),
                 state.getLatchTable(),
                 state.getProcTable(),
-                state.getSemaphoreTable(), subprogram);
+                state.getSemaphoreTable(),
+                state.getLockTable(), subprogram);
     }
 
     public ForkStmt(IStmt subprogram) {

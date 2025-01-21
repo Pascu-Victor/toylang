@@ -10,6 +10,7 @@ import com.wmy.models.adt.IDict;
 import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
+import com.wmy.models.adt.ILockTable;
 import com.wmy.models.adt.IProcTable;
 import com.wmy.models.adt.ISemaphoreTable;
 import com.wmy.models.adt.IStack;
@@ -48,4 +49,6 @@ public interface IProgController {
     public IProcTable getSelectedProgramStateProcedureTable();
 
     public ISemaphoreTable getSelectedProgramStateSemaphoreTable();
+
+    public ILockTable getSelectedProgramStateLockTable();
 }
