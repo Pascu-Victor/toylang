@@ -164,7 +164,9 @@ public class PrgState {
                 + fileTable.keys().toString()
                 + "Heap:\n"
                 + heap.toString()
-                + "Latch Table:\n"
+                + "\nProcedure Table:\n"
+                + procTable.toString()
+                + "\nLatch Table:\n"
                 + latchTable.toString()
                 + "\n";
     }
