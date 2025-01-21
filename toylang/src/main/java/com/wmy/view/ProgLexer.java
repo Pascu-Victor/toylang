@@ -260,9 +260,43 @@ public class ProgLexer {
                 return semReleaseStmt();
             case "acquire":
                 return semAcquireStmt();
+            case "for":
+                return forStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private ForStmt forStmt() {
+        consumeKeyword("for");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        IType varType = parseType();
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume('=');
+        skipWhitespace();
+        IExp startExp = expression();
+        skipWhitespace();
+        consume(';');
+        skipWhitespace();
+        IExp endExp = expression();
+        skipWhitespace();
+        consume(';');
+        skipWhitespace();
+        CloneableString stepVar = new CloneableString(id());
+        skipWhitespace();
+        consume('=');
+        skipWhitespace();
+        IExp stepExp = expression();
+        skipWhitespace();
+        consume(')');
+        skipWhitespace();
+        IStmt stmts = consumeCodeBlock();
+        skipWhitespace();
+        return new ForStmt(varName, varType, startExp, endExp, stepVar, stepExp, stmts);
     }
 
     private SemReleaseStmt semReleaseStmt() {

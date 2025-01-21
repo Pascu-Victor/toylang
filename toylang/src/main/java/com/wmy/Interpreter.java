@@ -180,6 +180,8 @@ public class Interpreter extends Application {
         var sourceSleep = "int v; v=10;\n" + //
                 "fork({v=(v-1);v=(v-1);print(v)}) sleep(10);print((v*10))";
 
+        var sourceForStmt = "int k; k=0; for(int v=0; (k<10); v=(k+1)) {k=v print(v) }";
+
         var sourceSemaphore = "Ref int v1; int cnt;\n" + //
                 "new(v1,1);newSemaphore(cnt,rH(v1));\n" + //
                 "fork({acquire(cnt);wH(v1,(rH(v1)*10));print(rH(v1));release(cnt)});\n" + //
@@ -253,6 +255,7 @@ public class Interpreter extends Application {
         commands.add(command("prgSleep.log", "sleep", "sleep program", sourceSleep));
         commands.add(command("prgCondExp.log", "condexp", "conditional expression program", sourceCondExp));
         commands.add(command("prgSemaphore.log", "semaphore", "semaphore program", sourceSemaphore));
+        commands.add(command("prgForStmt.log", "forstmt", "for statement program", sourceForStmt));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 
