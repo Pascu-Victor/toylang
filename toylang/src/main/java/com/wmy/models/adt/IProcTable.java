@@ -30,6 +30,10 @@ public interface IProcTable {
             return new ProcTableEntry(params.deepCopy(), procedure.deepCopy());
         }
 
+        @Override
+        public String toString() {
+            return "(" + params + ") {" + procedure + "}";
+        }
     }
 
     ProcTableEntry at(CloneableString key) throws ExecutionException;

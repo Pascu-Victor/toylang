@@ -46,4 +46,10 @@ public class ProcTable implements IProcTable {
     public Set<Entry<CloneableString, ProcTableEntry>> entrySet() {
         return content.entrySet().stream().map(e -> new Entry<>(e.getKey(), e.getValue())).collect(Collectors.toSet());
     }
+
+    @Override
+    public String toString() {
+        return content.entrySet().stream().map(e -> "procedure " + e.getKey() + " " + e.getValue())
+                .collect(Collectors.joining("\n"));
+    }
 }
