@@ -75,6 +75,15 @@ public class ProgLexer {
         return result.toString();
     }
 
+    private String symbol() {
+        StringBuilder result = new StringBuilder();
+        while (currentChar != '\0' && !Character.isLetterOrDigit(currentChar) && !Character.isWhitespace(currentChar)) {
+            result.append(currentChar);
+            advance();
+        }
+        return result.toString();
+    }
+
     private void consume(char expected) {
         if (currentChar == expected) {
             advance();
@@ -137,6 +146,16 @@ public class ProgLexer {
         char oldChar = currentChar;
         skipWhitespace();
         String token = id();
+        pos = oldPos;
+        currentChar = oldChar;
+        return token;
+    }
+
+    private String lookaheadSymbol() {
+        int oldPos = pos;
+        char oldChar = currentChar;
+        skipWhitespace();
+        String token = symbol();
         pos = oldPos;
         currentChar = oldChar;
         return token;
@@ -593,24 +612,58 @@ public class ProgLexer {
         return new RHExp(addrExp);
     }
 
+    private IExp condExp(IExp condExp) {
+        skipWhitespace();
+        consume('?');
+        skipWhitespace();
+        IExp thenExp = expression();
+        skipWhitespace();
+        consume(':');
+        skipWhitespace();
+        IExp elseExp = expression();
+        return new CondExp(condExp, thenExp, elseExp);
+    }
+
     private IExp expression() {
         skipWhitespace();
         if (Character.isDigit(currentChar)) {
-            return new ValueExp(new IntValue(Integer.parseInt(integer())));
+            var numericValue = new IntValue(Integer.parseInt(integer()));
+            var nextToken = lookaheadSymbol();
+            if (nextToken.equals("?")) {
+                return condExp(new ValueExp(numericValue));
+            }
+            return new ValueExp(numericValue);
         }
         var token = lookaheadToken();
         if (token.equals("true")) {
             consumeKeyword("true");
+            var nextToken = lookaheadSymbol();
+            if (nextToken.equals("?")) {
+                return condExp(new ValueExp(new BoolValue(true)));
+            }
             return new ValueExp(new BoolValue(true));
         }
         if (token.equals("false")) {
             consumeKeyword("false");
+            var nextToken = lookaheadSymbol();
+            if (nextToken.equals("?")) {
+                return condExp(new ValueExp(new BoolValue(false)));
+            }
             return new ValueExp(new BoolValue(false));
         }
         if (token.equals("rH")) {
-            return rhExp();
+            var exp = rhExp();
+            var nextToken = lookaheadSymbol();
+            if (nextToken.equals("?")) {
+                return condExp(exp);
+            }
+            return exp;
         }
         if (Character.isLetter(currentChar)) {
+            var nextToken = lookaheadSymbol();
+            if (nextToken.equals("?")) {
+                return condExp(new VarExp(id()));
+            }
             return new VarExp(id());
         }
         consume('(');
@@ -626,18 +679,33 @@ public class ProgLexer {
             case PLUS:
             case MINUS:
             case STAR:
-            case DIVIDE:
+            case DIVIDE: {
+                var nextToken = lookaheadSymbol();
+                if (nextToken.equals("?")) {
+                    return condExp(new ArithExp(exp1, exp2, op));
+                }
                 return new ArithExp(exp1, exp2, op);
+            }
             case AND:
-            case OR:
+            case OR: {
+                var nextToken = lookaheadSymbol();
+                if (nextToken.equals("?")) {
+                    return condExp(new LogicExp(exp1, exp2, op));
+                }
                 return new LogicExp(exp1, exp2, op);
+            }
             case LESS:
             case LESSEQ:
             case EQUAL:
             case NOTEQ:
             case GREATER:
-            case GREATEREQ:
+            case GREATEREQ: {
+                var nextToken = lookaheadSymbol();
+                if (nextToken.equals("?")) {
+                    return condExp(new RelExp(exp1, exp2, op));
+                }
                 return new RelExp(exp1, exp2, op);
+            }
             default:
                 throw new RuntimeException("Could not handle operator: " + op);
         }

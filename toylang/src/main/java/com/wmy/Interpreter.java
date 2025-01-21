@@ -188,6 +188,14 @@ public class Interpreter extends Application {
                 "print((rH(v1)-1));\n" + //
                 "release(cnt)";
 
+        var sourceCondExp = "int v; v = true ? 1 : 2; print(v);"
+                + " v = false ? 1 : 2; print(v);"
+                + " v = (1 > 0) ? 1 : 2; print(v);"
+                + " v = (0 == 0) ? 1 : 2; print(v);"
+                + " v = ((1+1) > 2) ? 1 : 2; print(v);"
+                + " v = ((1+1) <= 2) ? 1 : 2; print(v);"
+                + " Ref int i; new(i, 2); v = (rH(i) == 4) ? 1 : 2; print(v);";
+
         var programListUnchecked = scene.lookup("#programList");
 
         if (!(programListUnchecked instanceof ListView<?>)) {
@@ -243,6 +251,7 @@ public class Interpreter extends Application {
         commands.add(commandWithProcedures("prgProc2.log", "proc2", "procedure program 2", sourceProcedures2,
                 List.of(sourceProcedureSum, sourceProcedureProduct)));
         commands.add(command("prgSleep.log", "sleep", "sleep program", sourceSleep));
+        commands.add(command("prgCondExp.log", "condexp", "conditional expression program", sourceCondExp));
         commands.add(command("prgSemaphore.log", "semaphore", "semaphore program", sourceSemaphore));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
