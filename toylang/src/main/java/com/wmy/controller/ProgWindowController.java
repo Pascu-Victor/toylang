@@ -1,6 +1,7 @@
 package com.wmy.controller;
 
 import com.wmy.models.adt.Entry;
+import com.wmy.models.adt.IList;
 import com.wmy.models.adt.IProcTable.ProcTableEntry;
 
 import com.wmy.exceptions.ExecutionException;
@@ -54,6 +55,9 @@ public class ProgWindowController {
 
     @FXML
     public TableView<Entry<String, ProcTableEntry>> procedureTable;
+
+    @FXML
+    public TableView<Entry<Integer, Entry<Integer, IList<Integer>>>> semaphoreTable;
 
     @FXML
     public Button runOneStepButton;
@@ -110,6 +114,10 @@ public class ProgWindowController {
                 FXCollections.observableArrayList(program.getSelectedProgramStateProcedureTable().entrySet().stream()
                         .map(e -> new Entry<String, ProcTableEntry>(e.getKey().toString(), e.getValue()))
                         .toList()));
+        semaphoreTable.setItems(
+                FXCollections.observableArrayList(program.getSelectedProgramStateSemaphoreTable().entrySet().stream()
+                        .map(e -> new Entry<Integer, Entry<Integer, IList<Integer>>>(e.getKey(), e.getValue()))
+                        .toList()));
     }
 
     @FXML
@@ -154,6 +162,23 @@ public class ProgWindowController {
         TableColumn<Entry<String, ProcTableEntry>, String> procTableProcNameCol = new TableColumn<>("Procedure");
         procTableProcNameCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
         procedureTable.getColumns().add(0, procTableProcNameCol);
+
+        TableColumn<Entry<Integer, Entry<Integer, IList<Integer>>>, Integer> semaphoreTableIndexCol = new TableColumn<>(
+                "Semaphore Id");
+        semaphoreTableIndexCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
+        semaphoreTable.getColumns().add(0, semaphoreTableIndexCol);
+
+        TableColumn<Entry<Integer, Entry<Integer, IList<Integer>>>, Integer> semaphoreTableValueCol = new TableColumn<>(
+                "Value");
+        semaphoreTableValueCol.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue().getKey()));
+        semaphoreTable.getColumns().add(1, semaphoreTableValueCol);
+
+        TableColumn<Entry<Integer, Entry<Integer, IList<Integer>>>, String> semaphoreTableListCol = new TableColumn<>(
+                "Aquire List");
+        semaphoreTableListCol.setCellValueFactory(p -> new SimpleObjectProperty<>(
+                p.getValue().getValue().getValue().stream().map(e -> e.toString())
+                        .reduce((a, b) -> a + ", " + b.toString()).orElse("")));
+        semaphoreTable.getColumns().add(2, semaphoreTableListCol);
 
         TableColumn<Entry<String, ProcTableEntry>, String> procTableProcCodeCol = new TableColumn<>("Code");
         procTableProcCodeCol.setCellValueFactory(p -> {

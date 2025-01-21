@@ -78,7 +78,8 @@ public class Interpreter extends Application {
         var fbs = new ADict<CloneableString, CloneableBufferedReader>();
         var heap = new Heap();
         var latchTable = new LatchTable();
-        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, comp);
+        var semaphoreTable = new SemaphoreTable();
+        var prg = new PrgState(stk, sts, out, fbs, heap, latchTable, procTable, semaphoreTable, comp);
         var repo = new StateRepo(prg, logFile);
         return new ProgController(repo);
     }
@@ -179,6 +180,14 @@ public class Interpreter extends Application {
         var sourceSleep = "int v; v=10;\n" + //
                 "fork({v=(v-1);v=(v-1);print(v)}) sleep(10);print((v*10))";
 
+        var sourceSemaphore = "Ref int v1; int cnt;\n" + //
+                "new(v1,1);newSemaphore(cnt,rH(v1));\n" + //
+                "fork({acquire(cnt);wH(v1,(rH(v1)*10));print(rH(v1));release(cnt)});\n" + //
+                "fork({acquire(cnt);wH(v1,(rH(v1)*10));wH(v1,(rH(v1)*2));print(rH(v1));release(cnt)});\n" + //
+                "acquire(cnt);\n" + //
+                "print((rH(v1)-1));\n" + //
+                "release(cnt)";
+
         var programListUnchecked = scene.lookup("#programList");
 
         if (!(programListUnchecked instanceof ListView<?>)) {
@@ -234,6 +243,7 @@ public class Interpreter extends Application {
         commands.add(commandWithProcedures("prgProc2.log", "proc2", "procedure program 2", sourceProcedures2,
                 List.of(sourceProcedureSum, sourceProcedureProduct)));
         commands.add(command("prgSleep.log", "sleep", "sleep program", sourceSleep));
+        commands.add(command("prgSemaphore.log", "semaphore", "semaphore program", sourceSemaphore));
         programList.setItems(FXCollections
                 .observableArrayList(commands.stream().filter(c -> c != null).collect(Collectors.toList())));
 

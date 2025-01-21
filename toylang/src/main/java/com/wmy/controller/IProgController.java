@@ -11,6 +11,7 @@ import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
 import com.wmy.models.adt.IProcTable;
+import com.wmy.models.adt.ISemaphoreTable;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
 import com.wmy.models.values.IValue;
@@ -45,4 +46,6 @@ public interface IProgController {
     public ILatchTable getSelectedProgramStateLatchTable();
 
     public IProcTable getSelectedProgramStateProcedureTable();
+
+    public ISemaphoreTable getSelectedProgramStateSemaphoreTable();
 }

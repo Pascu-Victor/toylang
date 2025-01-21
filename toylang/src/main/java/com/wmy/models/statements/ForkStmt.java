@@ -17,7 +17,8 @@ public class ForkStmt implements IStmt {
         return new PrgState(stk, state.getSymTableStack().deepCopy(), state.getOut(), state.getFileTable(),
                 state.getHeap(),
                 state.getLatchTable(),
-                state.getProcTable(), subprogram);
+                state.getProcTable(),
+                state.getSemaphoreTable(), subprogram);
     }
 
     public ForkStmt(IStmt subprogram) {

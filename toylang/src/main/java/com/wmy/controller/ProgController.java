@@ -19,6 +19,7 @@ import com.wmy.models.adt.IHeap;
 import com.wmy.models.adt.ILatchTable;
 import com.wmy.models.adt.IList;
 import com.wmy.models.adt.IProcTable;
+import com.wmy.models.adt.ISemaphoreTable;
 import com.wmy.models.adt.IStack;
 import com.wmy.models.statements.IStmt;
 import com.wmy.models.types.RefType;
@@ -209,5 +210,9 @@ public class ProgController implements IProgController {
 
     public IProcTable getSelectedProgramStateProcedureTable() {
         return selectedPrgState.getProcTable();
+    }
+
+    public ISemaphoreTable getSelectedProgramStateSemaphoreTable() {
+        return selectedPrgState.getSemaphoreTable();
     }
 }

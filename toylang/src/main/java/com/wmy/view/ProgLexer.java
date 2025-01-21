@@ -235,9 +235,52 @@ public class ProgLexer {
                 return callStmt();
             case "sleep":
                 return sleepStmt();
+            case "newSemaphore":
+                return newSemStmt();
+            case "release":
+                return semReleaseStmt();
+            case "acquire":
+                return semAcquireStmt();
             default:
                 return assignStmt();
         }
+    }
+
+    private SemReleaseStmt semReleaseStmt() {
+        consumeKeyword("release");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new SemReleaseStmt(varName);
+    }
+
+    private SemAquireStmt semAcquireStmt() {
+        consumeKeyword("acquire");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(')');
+        return new SemAquireStmt(varName);
+    }
+
+    private NewSemStmt newSemStmt() {
+        consumeKeyword("newSemaphore");
+        skipWhitespace();
+        consume('(');
+        skipWhitespace();
+        CloneableString varName = new CloneableString(id());
+        skipWhitespace();
+        consume(',');
+        skipWhitespace();
+        IExp sizeExp = expression();
+        skipWhitespace();
+        consume(')');
+        return new NewSemStmt(varName, sizeExp);
     }
 
     private SleepStmt sleepStmt() {
